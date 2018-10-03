@@ -5,8 +5,8 @@ This repository contains codes for MMD-GAN and the repulsive loss proposed in th
 
 [1] Improving MMD-GAN Training with Repulsive Loss Function.  Under review as a conference paper at ICLR 2019. URL: https://openreview.net/forum?id=HygjqjR9Km.
 
-## Regarding the codes
-The codes here were written along with my learning of Python and GAN, so I apologise if you find them messy and confusing. The core idea is to define the neural network architecture as dictionaries to quickly test differnt models.
+## About the code
+The code was written along with my learning of Python and GAN, so I apologise if you find it messy and confusing. The core idea is to define the neural network architecture as dictionaries to quickly test differnt models.
 
 For your interest,
 1. DeepLearning/my_sngan/SNGan defines how the model is trained and evaluated. 
