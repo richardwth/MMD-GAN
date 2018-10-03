@@ -4,7 +4,7 @@ FLAGS.DEFAULT_IN = FLAGS.DEFAULT_IN + 'cifar_NCHW/'
 # FLAGS.SPECTRAL_NORM_MODE = 'sn_paper'  # default, sn_paper
 # FLAGS.WEIGHT_INITIALIZER = 'sn_paper'
 from GeneralTools.graph_func import Agent
-from DeepLearning.my_sngan2 import SNGan
+from DeepLearning.my_sngan import SNGan
 
 filename = 'cifar'
 act_k = True  # multiplier
@@ -53,17 +53,18 @@ code_x = np.random.randn(400, 128).astype(np.float32)
 # code_x = np.genfromtxt('MMD-GAN/z_128.txt', delimiter=',', dtype=np.float32)
 
 # a case
-lr_list = [2e-4, 5e-4]  # [dis, gen]
-loss_type = 'rmb'
-# rep_weights = [0.5, -0.5]  # weights for e_kxy and -e_kyy, w[0]-w[1] must be 1
+lr_list = [5e-4, 2e-4]  # [dis, gen]
+loss_type = 'rep'  
+# rep - repulsive loss, rmb - repulsive loss with bounded rbf kernel
+# to test other losses, see GeneralTools/math_func/GANLoss
+rep_weights = [0.0, -1.0]  # weights for e_kxy and -e_kyy, w[0]-w[1] must be 1
 sample_same_class = False
-# if loss_type in {'rep', 'rmb'}:
-#     sub_folder = 'sngan_{}_{:.0e}_{:.0e}_gl1_linear_{:.1f}_{:.1f}'.format(
-#         loss_type, lr_list[0], lr_list[1], rep_weights[0], rep_weights[1])
-# else:
-#     sub_folder = 'sngan_{}_{:.0e}_{:.0e}_gl1_linear'.format(loss_type, lr_list[0], lr_list[1])
-sub_folder = 'sngan_{}_{:.0e}_{:.0e}_gl1_linear'.format(loss_type, lr_list[0], lr_list[1])
-# sub_folder = 'sngan_rand_g_test'
+if loss_type in {'rep', 'rmb'}:
+    sub_folder = 'sngan_{}_{:.0e}_{:.0e}_gl1_linear_{:.1f}_{:.1f}'.format(
+        loss_type, lr_list[0], lr_list[1], rep_weights[0], rep_weights[1])
+else:
+    sub_folder = 'sngan_{}_{:.0e}_{:.0e}_gl1_linear'.format(loss_type, lr_list[0], lr_list[1])
+# sub_folder = 'sngan_{}_{:.0e}_{:.0e}_gl1_linear'.format(loss_type, lr_list[0], lr_list[1])
 
 agent = Agent(
     filename, sub_folder, load_ckpt=True, do_trace=False,
@@ -84,7 +85,7 @@ for i in range(8):
         _ = mdl.eval_sampling(
             filename, sub_folder, mesh_num=(20, 20), mesh_mode=0, code_x=code_x,
             real_sample=False, do_embedding=False, do_sprite=True)
-    if debug_mode is False:
+    if debug_mode is False:  # v1 - inception score and fid, ms_ssim - MS-SSIM
         scores = mdl.mdl_score(
             filename, sub_folder, batch_size, num_batch=781, model='v1')
         print('Epoch {} with scores: {}'.format(i, scores))
