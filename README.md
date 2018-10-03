@@ -14,15 +14,15 @@ For your interest,
 3. my_test_* contain the model architecture, hyperparameters, and training procedures. 
 
 ### How to use
-1. Modify misc_func accordingly; download and prepare the datasets.
+1. Modify GeneralTools/misc_func accordingly; download and prepare the datasets.
 2. Run my_test_* with proper hyperparameters
 
-## Regarding the algorithms
+## About the algorithms
 In spectral normalization of paper [1], we directly estimate the spectral norm of a convolution kernel, which empirically is larger than the spectral norm of the reshaped kernel estimated in [2]. Thus, our spectral normalization imposes a stronger pernalization than the original paper [2]. As a result, the norm of the signal will tend to decrease in each layer because:
 - It is unlikely for the signal to coincide with the first eigenvector of the kernel
-- It is likely the activation function (leaky ReLU or ReLU) decrease the norm of signal. 
+- It is likely the activation function (leaky ReLU or ReLU) reduces the norm of signal. 
 
-We found it essential to multiply a constant larger than 1 after each 
+Consequently, the discriminator outputs tend to be the same for any inputs (they are just the biases propogating through the network). Therefore, we found it essential to multiply a constant larger than 1 after each spectral normalization. 
 
 
 ## Reference
