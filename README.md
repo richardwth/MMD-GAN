@@ -20,6 +20,8 @@ This class defines how the model is trained and evaluated.
 - misc_func contains the basic info for machine, libraries and working directory
 
 3. my_test_* \
-These contain the model architecture, hyperparameters, and training procedures. 
+These scripts contain the model architecture, hyperparameters, and training procedures. 
 
 ## How to use
+1. Modify misc_func accordingly; download and prepare the datasets.
+2. Run my_test_* with proper hyperparameters
