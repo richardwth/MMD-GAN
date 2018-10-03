@@ -57,7 +57,7 @@ wget -P "data_download_folder/ImageNet"
 ```
 - Extract .tar file into images (under 1000 folders) (it took 4:04:59).
 ```python
-from Code.ImageNet.imagenet import extract_train
+from Addon.ImageNet.imagenet import extract_train
 tar_name = 'data_download_folder/ImageNet/ILSVRC2012_img_train.tar'
 target_dir = 'data_download_folder/ImageNet/train_jpeg'
 extract_train(tar_name, target_dir)
