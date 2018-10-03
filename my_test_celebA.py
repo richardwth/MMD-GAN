@@ -2,7 +2,7 @@ import numpy as np
 from GeneralTools.misc_fun import FLAGS
 FLAGS.DEFAULT_IN = FLAGS.DEFAULT_IN + 'celebA_NCHW/'
 from GeneralTools.graph_func import Agent
-from DeepLearning.my_sngan2 import SNGan
+from DeepLearning.my_sngan import SNGan
 
 num_file = 9
 filename = ['celebA_{:03d}'.format(i) for i in range(num_file)]
@@ -53,7 +53,7 @@ code_x = np.random.randn(400, 128).astype(np.float32)
 # code_x = np.genfromtxt('MMD-GAN/z_128.txt', delimiter=',', dtype=np.float32)
 
 # a case
-lr_list = [5e-4, 2e-4]  # [dis, gen]
+lr_list = [1e-4, 2e-4]  # [dis, gen]
 loss_type = 'rep'  
 # rep - repulsive loss, rmb - repulsive loss with bounded rbf kernel
 # to test other losses, see GeneralTools/math_func/GANLoss
