@@ -618,43 +618,43 @@ class SNGan(object):
 
             return scores
 
-    def mdl_intra_score(
-            self, file_format, sub_folder, class_range, batch_size, num_batch=10,
-            model='v1', ckpt_file=None):
-        """ This function calculates the scores for the real and generated samples of each class in class range
+#     def mdl_intra_score(
+#             self, file_format, sub_folder, class_range, batch_size, num_batch=10,
+#             model='v1', ckpt_file=None):
+#         """ This function calculates the scores for the real and generated samples of each class in class range
 
-        :param file_format: 'imagenet_{:03d}'
-        :param sub_folder:
-        :param class_range:
-        :param batch_size:
-        :param num_batch:
-        :param model:
-        :param ckpt_file:
-        :return:
-        """
-        # prepare folder
-        ckpt_folder, summary_folder, _ = prepare_folder(file_format.format(0), sub_folder=sub_folder)
+#         :param file_format: 'imagenet_{:03d}'
+#         :param sub_folder:
+#         :param class_range:
+#         :param batch_size:
+#         :param num_batch:
+#         :param model:
+#         :param ckpt_file:
+#         :return:
+#         """
+#         # prepare folder
+#         ckpt_folder, summary_folder, _ = prepare_folder(file_format.format(0), sub_folder=sub_folder)
 
-        # build the network graph
-        self.graph = tf.Graph()
-        with self.graph.as_default():
-            self.init_net()
-            metric = GenerativeModelMetric(model=model)
+#         # build the network graph
+#         self.graph = tf.Graph()
+#         with self.graph.as_default():
+#             self.init_net()
+#             metric = GenerativeModelMetric(model=model)
 
-            scores = np.zeros([class_range[1]-class_range[0], ], dtype=np.float32)
-            for class_id in range(class_range[0], class_range[1]):
-                # generate new images
-                code_batch = self.sample_codes(batch_size, code_y=class_id, name='code_te')
-                gen_batch = self.__gpu_task__(code_batch=code_batch, is_training=False)['x']
-                # do clipping
-                gen_batch = tf.clip_by_value(gen_batch, clip_value_min=-1, clip_value_max=1)
+#             scores = np.zeros([class_range[1]-class_range[0], ], dtype=np.float32)
+#             for class_id in range(class_range[0], class_range[1]):
+#                 # generate new images
+#                 code_batch = self.sample_codes(batch_size, code_y=class_id, name='code_te')
+#                 gen_batch = self.__gpu_task__(code_batch=code_batch, is_training=False)['x']
+#                 # do clipping
+#                 gen_batch = tf.clip_by_value(gen_batch, clip_value_min=-1, clip_value_max=1)
 
-                # calculate metric
-                if model == 'v1':
-                    scores[class_id] = metric.intra_fid(
-                        file_format.format(class_id), gen_batch, num_batch=num_batch,
-                        ckpt_folder=ckpt_folder, ckpt_file=ckpt_file)
-                else:
-                    raise NotImplementedError('Model {} not implemented.'.format(model))
+#                 # calculate metric
+#                 if model == 'v1':
+#                     scores[class_id] = metric.intra_fid(
+#                         file_format.format(class_id), gen_batch, num_batch=num_batch,
+#                         ckpt_folder=ckpt_folder, ckpt_file=ckpt_file)
+#                 else:
+#                     raise NotImplementedError('Model {} not implemented.'.format(model))
 
-            return scores
+#             return scores
