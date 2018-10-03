@@ -6,11 +6,11 @@ This repository contains codes for MMD-GAN and the repulsive loss proposed in th
 [1] Improving MMD-GAN Training with Repulsive Loss Function.  Under review as a conference paper at ICLR 2019. URL: https://openreview.net/forum?id=HygjqjR9Km.
 
 ## About the code
-The code was written along with my learning of Python and GAN, so I apologise if you find it messy and confusing. The core idea is to define the neural network architecture as dictionaries to quickly test differnt models.
+The code was written along with my learning of Python and GAN and contains many other models I have tried, so I apologise if you find it messy and confusing. The core idea is to define the neural network architecture as dictionaries to quickly test differnt models.
 
 For your interest,
 1. DeepLearning/my_sngan/SNGan defines how the model is trained and evaluated. 
-2. GeneralTools/graph_func contains metrics for evaluating generative models. GeneralTools/math_func contains spectral normalization and a variety of loss functions for GAN (including the proposed repulsive loss).
+2. GeneralTools/graph_func contains metrics for evaluating generative models (Line 1594). GeneralTools/math_func contains spectral normalization (Line 397) and a variety of loss functions for GAN (including the proposed repulsive loss at Line 2501 and 2516).
 3. my_test_* contain the model architecture, hyperparameters, and training procedures. 
 
 ### How to use
