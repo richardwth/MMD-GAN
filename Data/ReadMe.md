@@ -1,6 +1,4 @@
-This folder contains the data stored in tfrecords:
-
-It has the following folders:
+This folder contains the data stored in tfrecords. It has the following folders:
 - celebA_NCHW, contains 9 tfrecord files: celebA_000.tfrecords, ..., celebA_008.tfrecords
 - cifar_NCHW, contains 2 tfrecord files: cifar.tfrecords, cifar_xy.tfrecords (which has labels)
 - lsun_NCHW, contains 61 tfrecord files: lsun_000.tfrecords, ..., lsun_060.tfrecords
