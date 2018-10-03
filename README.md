@@ -3,10 +3,10 @@ GAN: generative adversarial nets; MMD: maximum mean discrepancy; TF: TensorFlow
 
 This repository contains codes for MMD-GAN and the repulsive loss proposed in the following paper:
 
-Improving MMD-GAN Training with Repulsive Loss Function.  Under review as a conference paper at ICLR 2019. URL: https://openreview.net/forum?id=HygjqjR9Km.
+[1] Improving MMD-GAN Training with Repulsive Loss Function.  Under review as a conference paper at ICLR 2019. URL: https://openreview.net/forum?id=HygjqjR9Km.
 
 ## Repository structure
-The codes here were written along with my learning of Python and GAN, so I apologise if you find them quite messy, out-of-date or informal. 
+The codes here were written along with my learning of Python and GAN, so I apologise if you find them quite messy, out-of-date or confusing. The core idea is to define the neural network using strings and dictionries so as to quickly test differnt models.
 
 The respository mainly contains:
 1. DeepLearning/my_sngan/SNGan \
@@ -23,3 +23,7 @@ These scripts contain the model architecture, hyperparameters, and training proc
 ## How to use
 1. Modify misc_func accordingly; download and prepare the datasets.
 2. Run my_test_* with proper hyperparameters
+
+## Note
+In [1], we
+We found it essential
