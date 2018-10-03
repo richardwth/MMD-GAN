@@ -13,7 +13,7 @@ To obtain the corresponding files, consider using the following codes:
 from GeneralTools.misc_fun import FLAGS
 FLAGS.DEFAULT_DOWNLOAD = data_download_folder
 ```
-# cifar
+## cifar
 ```python
 from GeneralTools.input_func import binary_image_to_tfrecords
 filename = ['cifar/cifar_{}'.format(i) for i in range(1, 6)]
@@ -22,7 +22,7 @@ binary_image_to_tfrecords(
     image_format_in_file='NCHW', target_image_format='NCHW', save_label=False)
 ```
     
-# stl
+## stl
 ```python
 from GeneralTools.input_func import binary_image_to_tfrecords
 binary_image_to_tfrecords(
@@ -30,7 +30,7 @@ binary_image_to_tfrecords(
     num_labels=0, resize=(48, 48), image_transpose=True,
     image_format_in_file='NCHW', target_image_format='NCHW')
 ```
-# celebA 
+## celebA 
 ```python
 # original image size 178*218, number 22511*9
 from GeneralTools.input_func import raw_image_to_tfrecords
@@ -40,7 +40,7 @@ raw_image_to_tfrecords(
     image_folder, output_filename, resize=(72, 88), crop=(64, 64),
     num_images_per_tfrecord=22511, image_format='NCHW')
 ```
-# lsun bedroom 
+## lsun bedroom 
 ```python
 # original image size 225*? or ?*225, number 3033042
 from GeneralTools.input_func import raw_image_to_tfrecords
@@ -50,9 +50,9 @@ raw_image_to_tfrecords(
     image_folder, output_filename, resize=(64, 64), crop=(64, 64),
     image_file_extension='webp', num_images_per_tfrecord=49722, image_format='NCHW')
 ```
-# imagenet 
+## imagenet 
 Original image size variable, number 1281167, class 1000
-- Download in terminal, took around 5 days for me
+- Download data in terminal (it took around 5 days for me)
 ```
 wget -P "data_download_folder/ImageNet"
 "http://www.image-net.org/challenges/LSVRC/2012/nnoupb/ILSVRC2012_img_train.tar"
