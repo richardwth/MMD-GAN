@@ -10,7 +10,7 @@ The code was written along with my learning of Python and GAN, so I apologise if
 
 For your interest,
 1. DeepLearning/my_sngan/SNGan defines how the model is trained and evaluated. 
-2. GeneralTools/graph_func contains metrics for evaluating generative models. GeneralTools/math_func contains spectral normalization and a variety of loss functions for GAN.
+2. GeneralTools/graph_func contains metrics for evaluating generative models. GeneralTools/math_func contains spectral normalization and a variety of loss functions for GAN (including the proposed repulsive loss).
 3. my_test_* contain the model architecture, hyperparameters, and training procedures. 
 
 ### How to use
