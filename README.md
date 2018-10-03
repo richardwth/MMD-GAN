@@ -23,7 +23,7 @@ In spectral normalization of our paper [1], we directly estimate the spectral no
 - It is likely the activation function (leaky ReLU or ReLU) reduces the norm of the signal. 
 
 Consequently, the discriminator outputs tend to be the same for any inputs (where the outputs are just the biases propagating through the network). Therefore, we found it essential to multiply the signal with a constant **C** > 1 after each spectral normalization (GeneralTools/layer_func Line 822). Actually, using a fixed kernel scale, the MMD loss seems to be sensitive to **C** as:
-- small **C** may limit the magnitude of pair-wise distance thus the boundary of kernel values.
+- small **C** may limit the magnitude of pair-wise distance, and thus affect the kernel values and gradients.
 - large **C** reduces the penalty of the spectral norm and may result in unstable training.
 
 I did not mention this in the paper [1] where we used 1.82 empirically. Later I found 1.5 seems to provide more stable results on CIFAR-10 dataset across different learning rate combinations. I will provide more details and discussion on this as soon as I get a chance to revise the paper. 
