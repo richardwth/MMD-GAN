@@ -8,7 +8,7 @@ Improving MMD-GAN Training with Repulsive Loss Function.  Under review as a conf
 ## Repository structure
 The codes here were written along with my learning of Python and GAN, so I apologise if you find them quite messy, out-of-date or informal. 
 
-The respository mainly contains two folders:
+The respository mainly contains:
 1. DeepLearning/my_sngan/SNGan \
 This class defines how the model is trained and evaluated. 
 
@@ -18,3 +18,8 @@ This class defines how the model is trained and evaluated.
 - layer_func has functions/classes to define operations in each layer and network routines.
 - math_func has functions/classes for basic math operations (like pairwise distance), spectral normalization, and a variety of loss functions for GAN.
 - misc_func contains the basic info for machine, libraries and working directory
+
+3. my_test_* \
+These contain the model architecture, hyperparameters, and training procedures. 
+
+## How to use
