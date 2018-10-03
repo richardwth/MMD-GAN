@@ -26,7 +26,7 @@ Consequently, the discriminator outputs tend to be the same for any inputs (wher
 - small **C** may limit the magnitude of pair-wise distance thus the boundary of kernel values.
 - large **C** reduces the penalization of spectral norm and may result in unstable training.
 
-I did not mention this in the paper [1] where we used 1.82 empirically. Later I found 1.5 seems to provide more stable results on CIFAR-10 across different learning rate combinations. I will provide more details and discussion on this as soon as I get a chance to revise the paper. 
+I did not mention this in the paper [1] where we used 1.82 empirically. Later I found 1.5 seems to provide more stable results on CIFAR-10 dataset across different learning rate combinations. I will provide more details and discussion on this as soon as I get a chance to revise the paper. 
 
 ## Reference
 [1] Improving MMD-GAN Training with Repulsive Loss Function.  Under review as a conference paper at ICLR 2019. URL: https://openreview.net/forum?id=HygjqjR9Km. \
