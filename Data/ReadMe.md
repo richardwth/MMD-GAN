@@ -5,6 +5,7 @@ It has the following folders:
 - cifar_NCHW, contains 2 tfrecord files: cifar.tfrecords, cifar_xy.tfrecords (which has labels)
 - lsun_NCHW, contains 61 tfrecord files: lsun_000.tfrecords, ..., lsun_060.tfrecords
 - stl_NCHW, contains 1 tfrecord file: stl.tfrecord
+- imagenet_NCHW, contains 1000 tfrecord files: imagenet_000.tfrecords, ..., imagenet_999.tfrecords
 
 To obtain the corresponding files, consider using the following codes:
 
