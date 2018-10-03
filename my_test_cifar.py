@@ -7,8 +7,8 @@ from GeneralTools.graph_func import Agent
 from DeepLearning.my_sngan2 import SNGan
 
 filename = 'cifar'
-act_k = True
-w_nm = 's'
+act_k = True  # multiplier
+w_nm = 's'  # spectral normalization
 architecture = {'input': [(3, 32, 32)],
                 'code': [(128, 'linear')],
                 'generator': [{'name': 'l1', 'out': 512 * 4 * 4, 'op': 'd', 'act': 'linear', 'act_nm': None,
