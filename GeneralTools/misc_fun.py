@@ -67,20 +67,21 @@ class SetFlag(object):
         self.SILENT_MODE = False
 
         # library info
-        self.TENSORFLOW_VERSION = '1.9.0'
+        self.TENSORFLOW_VERSION = '1.8.0'
         self.CUDA_VERSION = '9.0'
         self.CUDNN_VERSION = '7.0'
+        self.DRIVER_VERSION = '396.54'
 
         # directory setup
-        self.DEFAULT_IN = '/home/richard/PycharmProjects/myNN/Data/'
-        self.DEFAULT_OUT = '/home/richard/PycharmProjects/myNN/Results/'
-        self.DEFAULT_DOWNLOAD = '/home/richard/Downloads/Data/'
-        self.INCEPTION_V1 = '/home/richard/PycharmProjects/myNN/Code/inception_v1/inceptionv1_for_inception_score.pb'
-        self.INCEPTION_V3 = '/home/richard/PycharmProjects/myNN/Code/inception_v3/classify_image_graph_def.pb'
-
+        self.DEFAULT_IN = 'MMD-GAN/Data/'
+        self.DEFAULT_OUT = 'MMD-GAN/Results/'
+        self.DEFAULT_DOWNLOAD = 'MMD-GAN/Data/'
+        self.INCEPTION_V1 = 'MMD-GAN/Code/inception_v1/inceptionv1_for_inception_score.pb'
+        self.INCEPTION_V3 = None
+        
         # plotly account
-        self.PLT_ACC = 'Richard_wth'
-        self.PLT_KEY = 'cqBAQrgDsHm1blKmVVn8'
+        self.PLT_ACC = None
+        self.PLT_KEY = None
 
         # model setup
         self.IMAGE_FORMAT = 'channels_first'
