@@ -5,8 +5,8 @@ from GeneralTools.graph_func import Agent
 from DeepLearning.my_sngan import SNGan
 
 filename = 'stl'
-act_k = True
-w_nm = 's'
+act_k = True  # multiplier
+w_nm = 's'  # spectral normalization
 architecture = {'input': [(3, 48, 48)],
                 'code': [(128, 'linear')],
                 'generator': [{'name': 'l1', 'out': 512*6*6, 'op': 'd', 'act': 'relu', 'act_nm': 'bn',
