@@ -1,4 +1,3 @@
-"""
 This folder contains the data stored in tfrecords:
 
 It has the following folders:
@@ -63,5 +62,3 @@ output_filename = 'imagenet'
 raw_image_labels_to_tfrecords(
     parent_folder, output_filename, resize=(128, 128), crop=(128, 128),
     image_file_extension='JPEG', num_images_per_tfrecord=None, image_format='NCHW')
-
-"""
