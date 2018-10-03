@@ -18,14 +18,15 @@ For your interest,
 2. Run my_test_* with proper hyperparameters
 
 ## About the algorithms
-In spectral normalization of paper [1], we directly estimate the spectral norm of a convolution kernel, which empirically is larger than the spectral norm of the reshaped kernel estimated in [2]. Thus, our spectral normalization imposes a stronger pernalization than the original paper [2]. As a result, the norm of the signal will tend to decrease in each layer because:
-- It is unlikely for the signal to coincide with the first eigenvector of the kernel
+In spectral normalization of our paper [1], we directly estimate the spectral norm of a convolution kernel, which empirically is larger than the spectral norm of the reshaped kernel estimated in [2]. Thus, our spectral normalization imposes a stronger pernalization than [2]'s. As a result, in our case, the norm of the signal will tend to decrease in each layer because:
+- It is unlikely for the signal to coincide with the first eigenvector ("eigen-tensor") of the convolutional kernel
 - It is likely the activation function (leaky ReLU or ReLU) reduces the norm of signal. 
 
-Consequently, the discriminator outputs tend to be the same for any inputs (they are just the biases propogating through the network). Therefore, we found it essential to multiply a constant larger than 1 after each spectral normalization. 
+Consequently, the discriminator outputs tend to be the same for any inputs (where the outputs are just the biases propogating through the network). Therefore, we found it essential to multiply the signal with a constant **C**>1 after each spectral normalization. Actually, using a fixed kernel scale, the MMD loss seems to be sensitive to **C** as **C** may limit how large the pair-wise distance could be thus the boundary of kernel values.
 
+I did not mention this in the paper [1] where we used 1.82 empirically. Later I found 1.5 seems to provide more stable results across different learning rate combinations. I will provide more details and discussion on this as soon as I get a chance to revise the paper. 
 
 ## Reference
-[1] Improving MMD-GAN Training with Repulsive Loss Function.  Under review as a conference paper at ICLR 2019. URL: https://openreview.net/forum?id=HygjqjR9Km.
+[1] Improving MMD-GAN Training with Repulsive Loss Function.  Under review as a conference paper at ICLR 2019. URL: https://openreview.net/forum?id=HygjqjR9Km. \
 [2] Takeru Miyato, Toshiki Kataoka, Masanori Koyama, and Yuichi Yoshida. Spectral normalization
 for generative adversarial networks. In ICLR, 2018
