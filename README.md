@@ -11,14 +11,12 @@ The codes here were written along with my learning of Python and GAN, so I apolo
 The respository mainly contains:
 1. DeepLearning/my_sngan/SNGan \
 This class defines how the model is trained and evaluated. 
-
 2. GeneralTools
 - graph_func has functions/classes for TF Optimizer, Session, Summary, checkpoint file as well as metrics for evaluating generative models.
 - input_func has functions/classes for saving and reading data to/from tfrecords, and sampling from simple distributions.
 - layer_func has functions/classes to define operations in each layer and network routines.
 - math_func has functions/classes for basic math operations (like pairwise distance), spectral normalization, and a variety of loss functions for GAN.
 - misc_func contains the basic info for machine, libraries and working directory
-
 3. my_test_* \
 These scripts contain the model architecture, hyperparameters, and training procedures. 
 
