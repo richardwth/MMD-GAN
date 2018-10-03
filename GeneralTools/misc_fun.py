@@ -39,7 +39,7 @@ class SetFlag(object):
         self.DEFAULT_IN = 'MMD-GAN/Data/'
         self.DEFAULT_OUT = 'MMD-GAN/Results/'
         self.DEFAULT_DOWNLOAD = 'MMD-GAN/Data/'
-        self.INCEPTION_V1 = 'MMD-GAN/Code/inception_v1/inceptionv1_for_inception_score.pb'
+        self.INCEPTION_V1 = 'MMD-GAN/Addon/inception_v1/inceptionv1_for_inception_score.pb'
         self.INCEPTION_V3 = None
         
         # plotly account
