@@ -46,11 +46,11 @@ num_class = 0
 end_lr = 1e-7
 num_threads = 7
 
-# z_batch = np.random.randn(400, 128).astype(np.float32)
-# np.savetxt('/home/richard/PycharmProjects/myNN/Results/cifar_log/z_128.txt', z_batch, fmt='%.6f', delimiter=',')
-code_x = np.genfromtxt(
-    '/home/richard/PycharmProjects/myNN/Results/stl_log/z_128.txt',
-    delimiter=',', dtype=np.float32)
+# random code to test model
+code_x = np.random.randn(400, 128).astype(np.float32)
+# to show the model improvements over iterations, consider save the random codes and use later
+# np.savetxt('MMD-GAN/z_128.txt', z_batch, fmt='%.6f', delimiter=',')
+# code_x = np.genfromtxt('MMD-GAN/z_128.txt', delimiter=',', dtype=np.float32)
 
 # case 1
 lr_list = [2e-4, 2e-4]  # [dis, gen]
