@@ -22,7 +22,7 @@ In spectral normalization of our paper [1], we directly estimate the spectral no
 - It is unlikely for the signal to coincide with the first eigenvector ("eigentensor") of the convolutional kernel
 - It is likely the activation function (leaky ReLU or ReLU) reduces the norm of the signal. 
 
-Consequently, the discriminator outputs tend to be the same for any inputs (where the outputs are just the biases propagating through the network). Therefore, we found it essential to multiply the signal with a constant **C** > 1 after each spectral normalization (GeneralTools/layer_func Line 822). Actually, using a fixed kernel scale, the MMD loss seems to be sensitive to **C** as 
+Consequently, the discriminator outputs tend to be the same for any inputs (where the outputs are just the biases propagating through the network). Therefore, we found it essential to multiply the signal with a constant **C** > 1 after each spectral normalization (GeneralTools/layer_func Line 822). Actually, using a fixed kernel scale, the MMD loss seems to be sensitive to **C** as:
 - small **C** may limit the magnitude of pair-wise distance thus the boundary of kernel values.
 - large **C** reduces the penalty of the spectral norm and may result in unstable training.
 
