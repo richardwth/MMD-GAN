@@ -46,34 +46,45 @@ code_x = np.random.randn(400, 128).astype(np.float32)
 # code_x = np.genfromtxt('MMD-GAN/z_128.txt', delimiter=',', dtype=np.float32)
 
 ########################################################
-# a new case
-sub_folder = 'sngan_mmd_g_5e-4_control'
+# a case
+lr_list = [5e-4, 2e-4]  # [dis, gen]
+loss_type = 'rep'  
+# rep - repulsive loss, rmb - repulsive loss with bounded rbf kernel
+# to test other losses, see GeneralTools/math_func/GANLoss
+rep_weights = [0.0, -1.0]  # weights for e_kxy and -e_kyy, w[0]-w[1] must be 1
+sample_same_class = False
+if loss_type in {'rep', 'rmb'}:
+    sub_folder = 'sngan_{}_{:.0e}_{:.0e}_gl1_linear_{:.1f}_{:.1f}'.format(
+        loss_type, lr_list[0], lr_list[1], rep_weights[0], rep_weights[1])
+else:
+    sub_folder = 'sngan_{}_{:.0e}_{:.0e}_gl1_linear'.format(loss_type, lr_list[0], lr_list[1])
+# sub_folder = 'sngan_{}_{:.0e}_{:.0e}_gl1_linear'.format(loss_type, lr_list[0], lr_list[1])
+
 agent = Agent(
     filename, sub_folder, load_ckpt=True, do_trace=False,
     do_save=True, debug_mode=debug_mode, debug_step=400,
     query_step=1000, log_device=False, imbalanced_update=None,
     print_loss=True)
 
-lr_list = [5e-4, 5e-4]  # [gen, dis]
-misc = ['fixed_g_mix', 1.0, 0.05, 0.85]
-
 mdl = SNGan(
-    architecture, misc=misc, optimizer=optimizer,
-    do_summary=True, do_summary_image=True,
+    architecture, num_class=num_class, loss_type=loss_type,
+    optimizer=optimizer, do_summary=True, do_summary_image=True,
     num_summary_image=8, image_transpose=False)
 
-for i in range(1):
+for i in range(8):
     mdl.training(
-        filename, agent, num_instance, lr_list, end_lr=end_lr,
-        max_step=save_per_step, batch_size=batch_size, num_threads=num_threads)
+        filename, agent, num_instance, lr_list, end_lr=end_lr, max_step=save_per_step,
+        batch_size=batch_size, sample_same_class=sample_same_class, num_threads=num_threads)
     if debug_mode is not None:
         _ = mdl.eval_sampling(
-            filename, sub_folder, mesh_num=(20, 20), mesh_mode=0,
-            z_batch=z_batch, real_sample=False,
-            do_embedding=False, do_sprite=True)
+            filename, sub_folder, mesh_num=(20, 20), mesh_mode=0, code_x=code_x,
+            real_sample=False, do_embedding=False, do_sprite=True)
+    if debug_mode is False:  # v1 - inception score and fid, ms_ssim - MS-SSIM
         scores = mdl.mdl_score(
-            filename, sub_folder, batch_size, num_batch=312, model='v1')
+            filename, sub_folder, batch_size, num_batch=781, model='v1')
         print('Epoch {} with scores: {}'.format(i, scores))
+
+print('Chunk of code finished.')
 
 # iter_list = ['12500', '25000', '37500', '50000',
 #              '62500', '75000', '87500', '100000',
@@ -87,4 +98,4 @@ for i in range(1):
 #         ckpt_file='stl.ckpt-'+iter_list[i])
 #     print('Scores: {}'.format(scores))
 
-print('Chunk of code finished.')
+# print('Chunk of code finished.')
