@@ -6,8 +6,8 @@ from DeepLearning.my_sngan2 import SNGan
 
 num_file = 9
 filename = ['celebA_{:03d}'.format(i) for i in range(num_file)]
-act_k = True
-w_nm = 's'
+act_k = True  # multiplier
+w_nm = 's'  # spectral normalization
 architecture = {'input': [(3, 64, 64)],
                 'code': [(128, 'linear')],
                 'generator': [{'name': 'l1', 'out': 1024 * 4 * 4, 'op': 'd', 'act': 'linear', 'act_nm': None,
