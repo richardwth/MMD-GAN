@@ -2,7 +2,7 @@ import numpy as np
 from GeneralTools.misc_fun import FLAGS
 FLAGS.DEFAULT_IN = FLAGS.DEFAULT_IN + 'lsun_NCHW/'
 from GeneralTools.graph_func import Agent
-from DeepLearning.my_sngan2 import SNGan
+from DeepLearning.my_sngan import SNGan
 
 num_file = 61
 filename = ['lsun_{:03d}'.format(i) for i in range(num_file)]
