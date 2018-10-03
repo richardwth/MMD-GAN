@@ -12,6 +12,9 @@ The respository mainly contains two folders:
 1. DeepLearning/my_sngan/SNGan \
 This class defines how the model is trained and evaluated. 
 
-2. GeneralTools \
-- graph_func contains functions/classes related to TF Optimizer, Session, Summary, checkpoint file as well as metrics for evaluating generative models.
-- layer_func contains
+2. GeneralTools
+- graph_func has functions/classes for TF Optimizer, Session, Summary, checkpoint file as well as metrics for evaluating generative models.
+- input_func has functions/classes for saving and reading data to/from tfrecords, and sampling from simple distributions.
+- layer_func has functions/classes to define operations in each layer and network routines.
+- math_func has functions/classes for basic math operations (like pairwise distance), spectral normalization, and a variety of loss functions for GAN.
+- misc_func contains the basic info for machine, libraries and working directory
