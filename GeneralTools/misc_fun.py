@@ -11,50 +11,13 @@
 # # Default folders
 # flags.DEFINE_string(
 #     'DEFAULT_IN',
-#     '/home/richard/PycharmProjects/myNN/Data/',
+#     'MMD-GAN/Data/',
 #     """Default input folder.""")
-# flags.DEFINE_string(
-#     'DEFAULT_OUT',
-#     '/home/richard/PycharmProjects/myNN/Results/',
-#     """Default output folder to write summary and checkpoint files.""")
-# flags.DEFINE_string(
-#     'DEFAULT_DOWNLOAD',
-#     '/home/richard/Downloads/Data/',
-#     """Default download folder for large datasets.""")
+## ...
 #
-# # machine specs
-# flags.DEFINE_integer(
-#     'num_gpus',
-#     1,
-#     """Number of GPUs to use.""")
-# # minimum number in calculation
-# flags.DEFINE_float(
-#     'EPSI',
-#     1e-10,
-#     'Smallest positive number allowed in modeling')
-#
-# # plotly setup
-# # plotly credential file can be found at "C:\Users\Richard Wang\.plotly\.credentials"
-# flags.DEFINE_string(
-#     'PLT_ACC',
-#     'Richard_wth',
-#     """User name for plotly platform."""
-# )
-# flags.DEFINE_string(
-#     'PLT_KEY',
-#     'cqBAQrgDsHm1blKmVVn8',
-#     """api_key for plotly platform."""
-# )
-#
-# # data format
-# flags.DEFINE_string(
-#     'IMAGE_FORMAT',
-#     'channels_first',
-#     """Image data format, could be channels_first or channels_last""")
-#
-# # With 1.5.0-rc0 the Tensorflow maintainers have switched tf.app.flags to the flags module from abseil.
-# # Unfortunately, it is not 100% API compatible to the previous implementation.
-# # The following is added to avoid 'UnparsedFlagAccessError' and 'UnrecognizedFlagError'
+# With 1.5.0-rc0 the Tensorflow maintainers have switched tf.app.flags to the flags module from abseil.
+# Unfortunately, it is not 100% API compatible to the previous implementation.
+# The following is added to avoid 'UnparsedFlagAccessError' and 'UnrecognizedFlagError'
 # remaining_args = FLAGS([sys.argv[0]] + [flag for flag in sys.argv if flag.startswith("--")])
 # assert(remaining_args == [sys.argv[0]])
 
