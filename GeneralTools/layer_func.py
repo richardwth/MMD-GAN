@@ -799,14 +799,19 @@ class ParametricOperation(object):
                         if self.design['op'] in {'dcd'}:
                             self.kernel_norm = tf.squeeze(self.kernel_norm, axis=2)  # [num_class, 1]
                     elif self.design['op'] in {'c', 'tc', 'cck'}:
-                        # for c, tc, self.kernel_norm is scalar
-                        # for cck, self.kernel_norm shape should be [num_class, 1, 1, 1]
-                        sn_def = {'op': self.design['op']}
-                        sn_def.update({key: self.design[key] for key in ['strides', 'dilation', 'padding']})
-                        sn_def['input_shape'] = self.input_shape
-                        sn_def['data_format'] = self.data_format_alias
-                        sn_def['output_shape'] = self.output_shape
-                        self.kernel_norm = SpectralNorm(sn_def, 'SN', num_iter=1).apply(self.kernel)
+                        if FLAGS.SPECTRAL_NORM_MODE in {'default', 'PICO', 'pico'}:
+                            # for c, tc, self.kernel_norm is scalar
+                            # for cck, self.kernel_norm shape should be [num_class, 1, 1, 1]
+                            sn_def = {'op': self.design['op']}
+                            sn_def.update({key: self.design[key] for key in ['strides', 'dilation', 'padding']})
+                            sn_def['input_shape'] = self.input_shape
+                            sn_def['data_format'] = self.data_format_alias
+                            sn_def['output_shape'] = self.output_shape
+                            self.kernel_norm = SpectralNorm(sn_def, 'SN', num_iter=1).apply(self.kernel)
+                        elif FLAGS.SPECTRAL_NORM_MODE in {'sn_paper', 'PIM', 'pim'}:
+                            sn_def = {'op': 'd'}
+                            kernel = tf.reshape(self.kernel, (-1, self.kernel_shape[3]), name='flat')
+                            self.kernel_norm = SpectralNorm(sn_def, 'SN', num_iter=1).apply(kernel)
                 else:  # kernel normalization has not been implemented for sc kernels
                     raise NotImplementedError(
                         '{}: spectral norm for {} has not been implemented.'.format(
@@ -833,14 +838,16 @@ class ParametricOperation(object):
                         # self.multiplier = 1.0 / 0.55
                         # self.multiplier = np.sqrt(2.0)
                         # self.multiplier = 1.6
-                        self.multiplier = 1.5
+                        # self.multiplier = 1.5
                         # self.multiplier = 2.0
+                        self.multiplier = 1.0
                     elif self.design['act'] == 'relu':
                         # self.multiplier = 1.6
                         # self.multiplier = 2.0
                         # self.multiplier = np.sqrt(2.0)
-                        self.multiplier = 1.5
+                        # self.multiplier = 1.5
                         # self.multiplier = 2.0
+                        self.multiplier = 1.0
             elif FLAGS.WEIGHT_INITIALIZER == 'pg_paper':
                 if self.design['op'] in {'d', 'c', 'tc'}:
                     fan_in = np.prod(self.kernel_shape[:-1], dtype=np.float32)
