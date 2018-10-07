@@ -838,16 +838,16 @@ class ParametricOperation(object):
                         # self.multiplier = 1.0 / 0.55
                         # self.multiplier = np.sqrt(2.0)
                         # self.multiplier = 1.6
-                        # self.multiplier = 1.5
+                        self.multiplier = 1.5
                         # self.multiplier = 2.0
-                        self.multiplier = 1.0
+                        # self.multiplier = 1.0
                     elif self.design['act'] == 'relu':
                         # self.multiplier = 1.6
                         # self.multiplier = 2.0
                         # self.multiplier = np.sqrt(2.0)
-                        # self.multiplier = 1.5
+                        self.multiplier = 1.5
                         # self.multiplier = 2.0
-                        self.multiplier = 1.0
+                        # self.multiplier = 1.0
             elif FLAGS.WEIGHT_INITIALIZER == 'pg_paper':
                 if self.design['op'] in {'d', 'c', 'tc'}:
                     fan_in = np.prod(self.kernel_shape[:-1], dtype=np.float32)
