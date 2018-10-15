@@ -832,22 +832,23 @@ class ParametricOperation(object):
         if self.design['op'] in {'d', 'c', 'tc', 'dcd', 'dck', 'cck'}:
             # project is excluded as it can only be added at the last layer (not exactly but...)
             if self.design.get('w_nm') in ['spectral', 's']:
-                if self.design['act_k'] is True:
+                if isinstance(self.design['act_k'], (float, int)):
+                    self.multiplier = self.design['act_k']
                     # self.multiplier = None equals self.multiplier = 1
-                    if self.design['act'] == 'lrelu':
-                        # self.multiplier = 1.0 / 0.55
-                        # self.multiplier = np.sqrt(2.0)
-                        # self.multiplier = 1.6
-                        self.multiplier = 1.5
-                        # self.multiplier = 2.0
-                        # self.multiplier = 1.0
-                    elif self.design['act'] == 'relu':
-                        # self.multiplier = 1.6
-                        # self.multiplier = 2.0
-                        # self.multiplier = np.sqrt(2.0)
-                        self.multiplier = 1.5
-                        # self.multiplier = 2.0
-                        # self.multiplier = 1.0
+#                     if self.design['act'] == 'lrelu':
+#                         # self.multiplier = 1.0 / 0.55
+#                         # self.multiplier = np.sqrt(2.0)
+#                         # self.multiplier = 1.6
+#                         self.multiplier = 1.5
+#                         # self.multiplier = 2.0
+#                         # self.multiplier = 1.0
+#                     elif self.design['act'] == 'relu':
+#                         # self.multiplier = 1.6
+#                         # self.multiplier = 2.0
+#                         # self.multiplier = np.sqrt(2.0)
+#                         self.multiplier = 1.5
+#                         # self.multiplier = 2.0
+#                         # self.multiplier = 1.0
             elif FLAGS.WEIGHT_INITIALIZER == 'pg_paper':
                 if self.design['op'] in {'d', 'c', 'tc'}:
                     fan_in = np.prod(self.kernel_shape[:-1], dtype=np.float32)
