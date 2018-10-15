@@ -53,7 +53,7 @@ code_x = np.random.randn(400, 128).astype(np.float32)
 # code_x = np.genfromtxt('MMD-GAN/z_128.txt', delimiter=',', dtype=np.float32)
 
 # a case
-lr_list = [2e-4, 2e-4]  # [dis, gen]
+lr_list = [2e-4, 1e-4]  # [dis, gen]
 loss_type = 'rep'  
 # rep - repulsive loss, rmb - repulsive loss with bounded rbf kernel
 # to test other losses, see GeneralTools/math_func/GANLoss
