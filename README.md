@@ -23,8 +23,8 @@ In spectral normalization of our paper [1], we directly estimate the spectral no
 - It is unlikely for the signal to coincide with the first eigenvector ("eigentensor") of the convolutional kernel
 - It is likely the activation function (leaky ReLU or ReLU) reduces the norm of the signal. 
 
-Consequently, the discriminator outputs tend to be the same for any inputs (where the outputs are just the biases propagating through the network). Therefore, we found it essential to multiply the signal with a constant **C** > 1 after each spectral normalization (GeneralTools/layer_func Line 822). Actually, using a fixed kernel scale, the MMD loss seems to be sensitive to **C** as:
-- small **C** may limit the magnitude of pair-wise distance, and thus affect the kernel values and gradients.
+Consequently, the discriminator outputs tend to be the same for any inputs (where the outputs are just the biases propagating through the network). Therefore, we found it essential to multiply the signal with a constant **C** > 1 after each spectral normalization (GeneralTools/layer_func Line 822). The GAN performance (using the repulsive loss, MMD loss and hinge loss) seems to be sensitive to **C** as:
+- small **C** may limit the magnitude of model weights and gradients and slow down the training.
 - large **C** reduces the penalty of the spectral norm and may result in unstable training.
 
 I did not mention this in the paper [1] where we used **C**=1.82 empirically. Later I found **C**=![equation](http://latex.codecogs.com/gif.latex?64^{1/L}) seems to provide more stable results across different learning rate combinations, where L is the number of discriminator layers. I will provide more details and discussion on this as soon as I get a chance to revise the paper. 
