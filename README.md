@@ -27,7 +27,7 @@ Consequently, the discriminator outputs tend to be the same for any inputs (wher
 - small **C** may limit the magnitude of pair-wise distance, and thus affect the kernel values and gradients.
 - large **C** reduces the penalty of the spectral norm and may result in unstable training.
 
-I did not mention this in the paper [1] where we used 1.82 empirically. Later I found ![equation](http://latex.codecogs.com/gif.latex?64^{1/L}) seems to provide more stable results across different learning rate combinations, where L is the number of discriminator layers. I will provide more details and discussion on this as soon as I get a chance to revise the paper. 
+I did not mention this in the paper [1] where we used **C**=1.82 empirically. Later I found **C**=![equation](http://latex.codecogs.com/gif.latex?64^{1/L}) seems to provide more stable results across different learning rate combinations, where L is the number of discriminator layers. I will provide more details and discussion on this as soon as I get a chance to revise the paper. 
 
 ## Reference
 [1] Improving MMD-GAN Training with Repulsive Loss Function.  Under review as a conference paper at ICLR 2019. URL: https://openreview.net/forum?id=HygjqjR9Km. \
