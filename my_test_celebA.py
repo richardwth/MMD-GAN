@@ -60,7 +60,7 @@ loss_type = 'rep'
 rep_weights = [0.0, -1.0]  # weights for e_kxy and -e_kyy, w[0]-w[1] must be 1
 sample_same_class = False
 if loss_type in {'rep', 'rmb'}:
-    sub_folder = 'sngan_{}_{:.0e}_{:.0e}_k{:.3g}'.format(
+    sub_folder = 'sngan_{}_{:.0e}_{:.0e}_k{:.3g}_{:.1f}_{:.1f}'.format(
         loss_type, lr_list[0], lr_list[1], act_k, rep_weights[0], rep_weights[1])
 else:
     sub_folder = 'sngan_{}_{:.0e}_{:.0e}_k{:.3g}'.format(loss_type, lr_list[0], lr_list[1], act_k)
