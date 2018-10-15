@@ -7,7 +7,7 @@ from GeneralTools.graph_func import Agent
 from DeepLearning.my_sngan import SNGan
 
 filename = 'cifar'
-act_k = True  # multiplier
+act_k = np.power(64.0, 0.125)  # multiplier
 w_nm = 's'  # spectral normalization
 architecture = {'input': [(3, 32, 32)],
                 'code': [(128, 'linear')],
@@ -60,10 +60,13 @@ loss_type = 'rep'
 rep_weights = [0.0, -1.0]  # weights for e_kxy and -e_kyy, w[0]-w[1] must be 1
 sample_same_class = False
 if loss_type in {'rep', 'rmb'}:
-    sub_folder = 'sngan_{}_{:.0e}_{:.0e}_gl1_linear_{:.1f}_{:.1f}'.format(
-        loss_type, lr_list[0], lr_list[1], rep_weights[0], rep_weights[1])
+    sub_folder = 'sngan_{}_{:.0e}_{:.0e}_k{:.3g}_{:.1f}_{:.1f}'.format(
+        loss_type, lr_list[0], lr_list[1], act_k, rep_weights[0], rep_weights[1])
+#     sub_folder = 'sngan_{}_{:.0e}_{:.0e}_gl1_linear_{:.1f}_{:.1f}'.format(
+#         loss_type, lr_list[0], lr_list[1], rep_weights[0], rep_weights[1])
 else:
-    sub_folder = 'sngan_{}_{:.0e}_{:.0e}_gl1_linear'.format(loss_type, lr_list[0], lr_list[1])
+    sub_folder = 'sngan_{}_{:.0e}_{:.0e}_k{:.3g}'.format(loss_type, lr_list[0], lr_list[1], act_k)
+#     sub_folder = 'sngan_{}_{:.0e}_{:.0e}_gl1_linear'.format(loss_type, lr_list[0], lr_list[1])
 # sub_folder = 'sngan_{}_{:.0e}_{:.0e}_gl1_linear'.format(loss_type, lr_list[0], lr_list[1])
 
 agent = Agent(
