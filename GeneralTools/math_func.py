@@ -1382,18 +1382,16 @@ def mmd_g_bounded(
         k_yy = tf.exp(-dist_yy / (2.0 * sigma ** 2), name='k_yy')
         k_xy = tf.exp(-dist_xy / (2.0 * sigma ** 2), name='k_xy')
 
+        # in rep loss, custom_weights[0] - custom_weights[1] = 1
         k_xx_b = tf.exp(-tf.maximum(dist_xx, lower_bound) / (2.0 * sigma ** 2), name='k_xx_lb')
-        if custom_weights[1] > 0:  # the original mmd-g
+        if custom_weights[0] > 0:
             k_xy_b = tf.exp(-tf.minimum(dist_xy, upper_bound) / (2.0 * sigma ** 2), name='k_xy_ub')
+        else:
+            k_xy_b = k_xy  # no lower bound should be enforced as k_xy may be zero at equilibrium
+        if custom_weights[1] > 0:  # the original mmd-g
             k_yy_b = tf.exp(-tf.maximum(dist_yy, lower_bound) / (2.0 * sigma ** 2), name='k_yy_ub')
         else:  # the repulsive mmd-g
-            k_xy_b = k_xy
             k_yy_b = tf.exp(-tf.minimum(dist_yy, upper_bound) / (2.0 * sigma ** 2), name='k_yy_ub')
-
-        # if upper_bound is None:
-        #     k_xy = tf.exp(-dist_xy / (2.0 * sigma**2), name='k_xy')
-        # else:
-        #     k_xy = tf.exp(-tf.minimum(dist_xy, upper_bound) / (2.0 * sigma ** 2), name='k_xy_ub')
 
         m = tf.constant(batch_size, tf.float32)
         e_kxx = matrix_mean_wo_diagonal(k_xx, m)
@@ -1401,7 +1399,7 @@ def mmd_g_bounded(
         e_kyy = matrix_mean_wo_diagonal(k_yy, m)
         e_kxx_b = matrix_mean_wo_diagonal(k_xx_b, m)
         e_kyy_b = matrix_mean_wo_diagonal(k_yy_b, m)
-        e_kxy_b = matrix_mean_wo_diagonal(k_xy_b, m) if custom_weights[1] > 0 else e_kxy
+        e_kxy_b = matrix_mean_wo_diagonal(k_xy_b, m) if custom_weights[0] < 0 else e_kxy
 
         if do_summary:
             with tf.name_scope(None):  # return to root scope to avoid scope overlap
@@ -1410,7 +1408,7 @@ def mmd_g_bounded(
                 tf.summary.scalar(scope_prefix + name + '/kxy', e_kxy)
                 tf.summary.scalar(scope_prefix + name + '/kxx_b', e_kxx_b)
                 tf.summary.scalar(scope_prefix + name + '/kyy_b', e_kyy_b)
-                if custom_weights[1] > 0:
+                if custom_weights[0] > 0:
                     tf.summary.scalar(scope_prefix + name + '/kxy_b', e_kxy_b)
 
         if var_target is None:
@@ -2499,7 +2497,7 @@ class GANLoss(object):
                 tf.summary.scalar('GANLoss/sigma', sigma)
 
     def _repulsive_mmd_g_(self):
-        """
+        """ repulsive loss
 
         :return:
         """
@@ -2514,7 +2512,7 @@ class GANLoss(object):
             name='mmd_g', do_summary=self.do_summary, scope_prefix='', custom_weights=self.repulsive_weights)
 
     def _repulsive_mmd_g_bounded_(self):
-        """
+        """ rmb loss
 
         :return:
         """
