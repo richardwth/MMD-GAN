@@ -22,6 +22,7 @@ For your interest,
 ## About the algorithms
 Here we summarize the algorithms and tricks in case you would like to implement the algorithms yourself. 
 
+### Proposed Methods
 The paper [1] proposed three methods:
 1. Repulsive loss
 
@@ -41,11 +42,13 @@ where ![equation](https://latex.codecogs.com/gif.latex?\inline&space;x_i,x_j) - 
 
 At iteration t, for convolution kernel ![equation](https://latex.codecogs.com/gif.latex?\inline&space;W_c), do ![equation](https://latex.codecogs.com/gif.latex?\inline&space;u=\text{conv}(W_c,v^t)), ![equation](https://latex.codecogs.com/gif.latex?\inline&space;\hat{v}=\text{transpose-conv}(W_c,u)), and ![equation](https://latex.codecogs.com/gif.latex?\inline&space;v^{t+1}=\hat{v}/\left&space;\|&space;\hat{v}&space;\right&space;\|). The spectral norm is estimated as ![equation](https://latex.codecogs.com/gif.latex?\inline&space;\sigma_W=\left&space;\|&space;u&space;\right&space;\|).
 
-Tricks:
-1. ss
-2. Spectral normalization is initially proposed in [2]. The idea is, at each layer, to use ![equation](https://latex.codecogs.com/gif.latex?\inline&space;\hat{W}_c=W_c\cdot&space;\frac{C}{\sigma_W}) for convolution/dense multiplication. Here we multiply the signal with a constant C>1 after each spectral normalization to compensate for the decreas of signal norm at each layer. In the main text of paper [1], we used C=1/0.55 empirically. In Appendix C.3, we tested the effects of C on the performance of several loss functions. [2] 
+### Practical Tricks
+We recommend using the following tricks.
+1. Spectral normalization, initially proposed in [2]. The idea is, at each layer, to use ![equation](https://latex.codecogs.com/gif.latex?\inline&space;\hat{W}_c=W_c\cdot&space;\frac{C}{\sigma_W}) for convolution/dense multiplication. Here we multiply the signal with a constant C>1 after each spectral normalization to compensate for the decreas of signal norm at each layer. In the main text of paper [1], we used C=1/0.55 empirically. In Appendix C.3, we tested the effects of C on the performance of several loss functions.
+2. Two time-scale update rule (TTUR) [3]. The idea is to use different learning rates for the generator and discriminator. 
 
 ## Reference
 [1] Improving MMD-GAN Training with Repulsive Loss Function.  Under review as a conference paper at ICLR 2019. URL: https://openreview.net/forum?id=HygjqjR9Km. \
 [2] Takeru Miyato, Toshiki Kataoka, Masanori Koyama, and Yuichi Yoshida. Spectral normalization
 for generative adversarial networks. In ICLR, 2018
+[3] Martin Heusel, Hubert Ramsauer, Thomas Unterthiner, Bernhard Nessler, and Sepp Hochreiter.  GANs Trained by a Two Time-Scale Update Rule Converge to a Nash Equilibrium. In NIPS, 2017.
