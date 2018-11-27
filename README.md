@@ -49,6 +49,8 @@ We recommend using the following tricks.
 
 In some cases, you may find training using the repulsive loss does not converge. Do not panic. It may be that the learning rate is not suitable. Please try other learning rate or the bounded kernel. 
 
+Please feel free to contact me if things do not work or suddenly work, or if exploring my code ruins your day. :)
+
 ## Reference
 [1] Improving MMD-GAN Training with Repulsive Loss Function.  Under review as a conference paper at ICLR 2019. URL: https://openreview.net/forum?id=HygjqjR9Km. \
 [2] Takeru Miyato, Toshiki Kataoka, Masanori Koyama, and Yuichi Yoshida. Spectral normalization
