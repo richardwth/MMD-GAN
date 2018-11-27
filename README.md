@@ -39,7 +39,7 @@ where ![equation](https://latex.codecogs.com/gif.latex?\inline&space;x_i,x_j) - 
 
 3. Power iteration for convolution (used in spectral normalization)
 
-At each iteration, for convolution kernel ![equation](https://latex.codecogs.com/gif.latex?\inline&space;W_c), do ![equation](https://latex.codecogs.com/gif.latex?\inline&space;u=\text{conv}(W_c,v)), ![equation](https://latex.codecogs.com/gif.latex?\inline&space;v=\text{transpose-conv}(W_c,u)), and ![equation](https://latex.codecogs.com/gif.latex?\inline&space;\hat{v}=v/\left&space;\|&space;v&space;\right&space;\|).
+At iteration t, for convolution kernel ![equation](https://latex.codecogs.com/gif.latex?\inline&space;W_c), do ![equation](https://latex.codecogs.com/gif.latex?\inline&space;u=\text{conv}(W_c,v^t)), ![equation](https://latex.codecogs.com/gif.latex?\inline&space;\hat{v}=\text{transpose-conv}(W_c,u)), and ![equation](https://latex.codecogs.com/gif.latex?\inline&space;v^{t+1}=\hat{v}/\left&space;\|&space;\hat{v}&space;\right&space;\|).
 
 
 In spectral normalization of our paper [1], we directly estimate the spectral norm of a convolution kernel, which empirically is larger than the spectral norm of the reshaped kernel estimated in [2]. Thus, our spectral normalization imposes a stronger penalty than [2]'s. As a result, in our case, the norm of the signal will tend to decrease in each layer because:
