@@ -16,7 +16,8 @@ from GeneralTools.input_func import ReadTFRecords
 from GeneralTools.graph_func import prepare_folder, write_sprite_wrapper, \
     global_step_config, multi_opt_config, embedding_image_wrapper, GenerativeModelMetric, rollback
 from GeneralTools.layer_func import Net, Routine
-from GeneralTools.math_func import MeshCode, get_squared_dist, witness_mix_g, witness_mix_t, GANLoss
+from GeneralTools.math_func import MeshCode, get_squared_dist, witness_mix_g, witness_mix_t, GANLoss, witness_g, \
+    jacobian_squared_frobenius_norm
 
 ########################################################################
 # from GeneralTools.misc_fun import FLAGS
@@ -147,67 +148,95 @@ class SNGan(object):
                 return {'x': code_x, 'y': code_y}
 
     ###################################################################
-#     def gradient_penalty(self, x, x_gen, batch_size):
-#         """ This function calculates the gradient penalty used in wassersetin gan
+    def gradient_penalty(self, x, x_gen, batch_size):
+    """ This function calculates the gradient penalty used in wassersetin gan
 
-#         :param x:
-#         :param x_gen:
-#         :param batch_size:
-#         :return:
-#         """
-#         uni = tf.random_uniform(
-#             shape=[batch_size, 1, 1, 1],  # [batch_size, channels, height, width]
-#             minval=0.0, maxval=1.0,
-#             name='uniform')
-#         x_hat = tf.identity(
-#             tf.add(tf.multiply(x, uni), tf.multiply(x_gen, tf.subtract(1.0, uni))),
-#             name='x_hat')
-#         s_x_hat = self.Dis(x_hat, is_training=False)
-#         g_x_hat = tf.reshape(
-#             tf.gradients(s_x_hat, x_hat, name='gradient_x_hat')[0],
-#             [batch_size, -1])
-#         loss_grad_norm = tf.reduce_mean(
-#             tf.square(tf.norm(g_x_hat, ord=2, axis=1) - 1))
-#         return loss_grad_norm
+    :param x:
+    :param x_gen:
+    :param batch_size:
+    :return:
+    """
+    with tf.name_scope('gradient_penalty'):
+        uni = tf.random_uniform(
+            shape=[batch_size, 1, 1, 1],  # [batch_size, channels, height, width]
+            minval=0.0, maxval=1.0,
+            name='uniform')
+        x_hat = tf.identity(
+            tf.add(tf.multiply(x, uni), tf.multiply(x_gen, tf.subtract(1.0, uni))),
+            name='x_hat')
+        s_x_hat = self.Dis(x_hat, is_training=False)
+        g_x_hat = tf.reshape(
+            tf.gradients(s_x_hat['x'], x_hat, name='gradient_x_hat')[0],
+            [batch_size, -1])
+        loss_grad_norm = tf.reduce_mean(
+            tf.square(tf.norm(g_x_hat, ord=2, axis=1) - 1))
+        
+        return loss_grad_norm
 
-#     def mmd_gradient_penalty(self, x, x_gen, s_x, s_gen, batch_size, mode='fixed_g'):
-#         """ This function calculates the gradient penalty used in mmd-gan
+    ###################################################################
+    def mmd_gradient_penalty(self, x, x_gen, s_x, s_gen, batch_size, mode='fixed_g'):
+        """ This function calculates the gradient penalty used in mmd-gan
 
-#         :param x: real images
-#         :param x_gen: generated images
-#         :param s_x: scores of real images
-#         :param s_gen: scores of generated images
-#         :param batch_size:
-#         :param mode:
-#         :return:
-#         """
-#         uni = tf.random_uniform(
-#             shape=[batch_size, 1, 1, 1],  # [batch_size, channels, height, width]
-#             minval=0.0, maxval=1.0,
-#             name='uniform')
-#         x_hat = tf.identity(
-#             tf.add(tf.multiply(x, uni), tf.multiply(x_gen, tf.subtract(1.0, uni))),
-#             name='x_hat')
-#         s_x_hat = self.Dis(x_hat, is_training=False)
-#         # get witness function w.r.t. x, x_gen
-#         dist_zx = get_squared_dist(s_x_hat, s_x, mode='xy', name='dist_zx', do_summary=self.do_summary)
-#         dist_zy = get_squared_dist(s_x_hat, s_gen, mode='xy', name='dist_zy', do_summary=self.do_summary)
-#         if mode == 'fixed_g_gp':
-#             witness = witness_mix_g(
-#                 dist_zx, dist_zy, sigma=[1.0, 2.0, 4.0, 8.0, 16.0],
-#                 name='witness', do_summary=self.do_summary)
-#         elif mode == 'fixed_t_gp':
-#             witness = witness_mix_t(
-#                 dist_zx, dist_zy, alpha=[0.25, 0.5, 0.9, 2.0, 25.0], beta=2.0,
-#                 name='witness', do_summary=self.do_summary)
-#         else:
-#             raise NotImplementedError('gradient penalty: {} not implemented'.format(mode))
-#         g_x_hat = tf.reshape(
-#             tf.gradients(witness, x_hat, name='gradient_x_hat')[0],
-#             [batch_size, -1])
-#         loss_grad_norm = tf.reduce_mean(
-#             tf.square(tf.norm(g_x_hat, ord=2, axis=1) - 1))
-#         return loss_grad_norm
+        This code is inspired by the code for the following paper:
+        Binkowski M., Sutherland D.J., Arbel M., and Gretton A.
+        Demystifying MMD GANs. ICLR 2018
+
+        :param x: real images
+        :param x_gen: generated images
+        :param s_x: scores of real images
+        :param s_gen: scores of generated images
+        :param batch_size:
+        :param mode:
+        :return:
+        """
+        with tf.name_scope('gradient_penalty'):
+            uni = tf.random_uniform(
+                shape=[batch_size, 1, 1, 1],  # [batch_size, channels, height, width]
+                minval=0.0, maxval=1.0,
+                name='uniform')
+            x_hat = tf.identity(
+                tf.add(tf.multiply(x, uni), tf.multiply(x_gen, tf.subtract(1.0, uni))),
+                name='x_hat')
+            s_x_hat = self.Dis(x_hat, is_training=False)
+            # get witness function w.r.t. x, x_gen
+            dist_zx = get_squared_dist(s_x_hat['x'], s_x, mode='xy', name='dist_zx', do_summary=self.do_summary)
+            dist_zy = get_squared_dist(s_x_hat['x'], s_gen, mode='xy', name='dist_zy', do_summary=self.do_summary)
+            if mode == 'fixed_g_gp':
+                witness = witness_mix_g(
+                    dist_zx, dist_zy, sigma=[1.0, np.sqrt(2.0), 2.0, np.sqrt(8.0), 4.0],
+                    name='witness', do_summary=self.do_summary)
+            elif mode == 'fixed_t_gp':
+                witness = witness_mix_t(
+                    dist_zx, dist_zy, alpha=[0.25, 0.5, 0.9, 2.0, 25.0], beta=2.0,
+                    name='witness', do_summary=self.do_summary)
+            elif mode in {'rep_gp', 'rmb_gp'}:
+                witness = witness_g(
+                    dist_zx, dist_zy, sigma=1.0, name='witness', do_summary=self.do_summary)
+            else:
+                raise NotImplementedError('gradient penalty: {} not implemented'.format(mode))
+            g_x_hat = tf.reshape(
+                tf.gradients(witness, x_hat, name='gradient_x_hat')[0],
+                [batch_size, -1])
+            loss_grad_norm = tf.reduce_mean(
+                tf.square(tf.norm(g_x_hat, ord=2, axis=1) - 1))
+        return loss_grad_norm
+    
+    ###################################################################
+    def mmd_gradient_scale(self, x, s_x):
+        """ This function calculates the gradient penalty used in scaled mmd-gan.
+
+        This code is inspired by the following paper:
+        Arbel M., Sutherland, D.J., Binkowski M., and Gretton A.
+        On gradient regularizers for MMD GANs Michael. NIPS, 2018.
+
+        :param x:
+        :param s_x:
+        :return:
+        """
+        jaco_sfn = jacobian_squared_frobenius_norm(s_x, x, do_summary=self.do_summary)
+        dis_loss_scale = 1.0 / (self.penalty_weight * tf.reduce_mean(jaco_sfn) + 1.0)
+
+        return dis_loss_scale
 
     ###################################################################
     @staticmethod
