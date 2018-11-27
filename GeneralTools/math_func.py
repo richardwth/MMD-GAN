@@ -2102,6 +2102,7 @@ class GANLoss(object):
         self.loss_gen = None
         self.loss_dis = None
         self.dis_penalty = None
+        self.dis_scale = None
         self.debug_register = None  # output used for debugging
         # hyperparameters
         self.sigma = [1.0, np.sqrt(2.0), 2.0, np.sqrt(8.0), 4.0]
@@ -2145,9 +2146,14 @@ class GANLoss(object):
         """ wasserstein distance
         :return:
         """
+        assert self.dis_penalty is not None, 'Discriminator penalty must be provided for wasserstein GAN'
         with tf.name_scope('wasserstein'):
-            self.loss_dis = - tf.reduce_mean(self.score_data) + tf.reduce_mean(self.score_gen) + self.dis_penalty
-            self.loss_gen = - self.loss_gen
+            self.loss_gen = tf.reduce_mean(self.score_data) - tf.reduce_mean(self.score_gen)
+            self.loss_dis = - self.loss_gen + self.dis_penalty
+
+        if self.do_summary:
+            with tf.name_scope(None):  # return to root scope to avoid scope overlap
+                tf.summary.scalar('GANLoss/dis_penalty', self.dis_penalty)
 
         return self.loss_dis, self.loss_gen
 
@@ -2510,6 +2516,16 @@ class GANLoss(object):
         self.loss_gen, self.loss_dis = mmd_g(
             dist_gg, dist_gd, dist_dd, self.batch_size, sigma=1.0,
             name='mmd_g', do_summary=self.do_summary, scope_prefix='', custom_weights=self.repulsive_weights)
+        if self.dis_penalty is not None:
+            self.loss_dis = self.loss_dis + self.dis_penalty
+            if self.do_summary:
+                with tf.name_scope(None):  # return to root scope to avoid scope overlap
+                    tf.summary.scalar('GANLoss/dis_penalty', self.dis_penalty)
+        if self.dis_scale is not None:
+            self.loss_dis = (self.loss_dis - 1.0) * self.dis_scale
+            if self.do_summary:
+                with tf.name_scope(None):  # return to root scope to avoid scope overlap
+                    tf.summary.scalar('GANLoss/dis_scale', self.dis_scale)
 
     def _repulsive_mmd_g_bounded_(self):
         """ rmb loss
@@ -2522,6 +2538,16 @@ class GANLoss(object):
         self.loss_gen, self.loss_dis = mmd_g_bounded(
             dist_gg, dist_gd, dist_dd, self.batch_size, sigma=1.0, lower_bound=0.25, upper_bound=4.0,
             name='mmd_g', do_summary=self.do_summary, scope_prefix='', custom_weights=self.repulsive_weights)
+        if self.dis_penalty is not None:
+            self.loss_dis = self.loss_dis + self.dis_penalty
+            if self.do_summary:
+                with tf.name_scope(None):  # return to root scope to avoid scope overlap
+                    tf.summary.scalar('GANLoss/dis_penalty', self.dis_penalty)
+        if self.dis_scale is not None:
+            self.loss_dis = self.loss_dis * self.dis_scale
+            if self.do_summary:
+                with tf.name_scope(None):  # return to root scope to avoid scope overlap
+                    tf.summary.scalar('GANLoss/dis_scale', self.dis_scale)
 
     def _test_(self):
         self.loss_dis = 0.0
@@ -2545,6 +2571,8 @@ class GANLoss(object):
             self.num_scores = kwargs['d']
         if 'dis_penalty' in kwargs:
             self.dis_penalty = kwargs['dis_penalty']
+        if 'dis_scale' in kwargs:
+            self.dis_scale = kwargs['dis_scale']
         if 'sigma' in kwargs:
             self.sigma = kwargs['sigma']
         if 'alpha' in kwargs:
@@ -2560,10 +2588,14 @@ class GANLoss(object):
         # check inputs
         if loss_type in {'fixed_g', 'mmd_g', 'fixed_t', 'mmd_t', 'mmd_g_mix', 'fixed_g_mix',
                          'rand_g', 'rand_g_mix', 'sym_rg_mix', 'instance_noise', 'ins_noise',
-                         'sym_rg', 'rgb'}:
+                         'sym_rg', 'rgb', 'rep', 'rep_gp', 'rmb', 'rmb_gp'}:
             assert self.batch_size is not None, 'GANLoss: batch_size must be provided'
             if loss_type in {'rand_g', 'rand_g_mix', 'sym_rg_mix', 'sym_rg'}:
                 assert self.num_scores is not None, 'GANLoss: d must be provided'
+        if loss_type in {'rep_gp', 'rmb_gp', 'wasserstein'}:
+            assert self.dis_penalty is not None, 'Discriminator penalty must be provided.'
+        if loss_type in {'rep_ds', 'rmb_ds'}:
+            assert self.dis_scale is not None, 'Discriminator loss scale must be provided.'
 
         # loss
         if loss_type in {'logistic', ''}:
@@ -2609,9 +2641,9 @@ class GANLoss(object):
                 self._rand_g_instance_noise_(kwargs['mix_threshold'])
             else:
                 self._rand_g_instance_noise_()
-        elif loss_type in {'rep', 'rep_mmd_g'}:
+        elif loss_type in {'rep', 'rep_mmd_g', 'rep_gp', 'rep_ds'}:
             self._repulsive_mmd_g_()
-        elif loss_type in {'rmb'}:
+        elif loss_type in {'rmb', 'rep_b', 'rep_mmd_b', 'rmb_gp', 'rmb_ds'}:
             self._repulsive_mmd_g_bounded_()
         elif loss_type == 'test':
             self._test_()
@@ -2696,3 +2728,52 @@ def trace_sqrt_product_tf(cov1, cov2):
     cov_121 = tf.matmul(tf.matmul(sqrt_cov1, cov2), sqrt_cov1)
 
     return tf.trace(sqrt_sym_mat_tf(cov_121))
+
+
+def jacobian(y, x, name='jacobian'):
+    """ This function calculates the jacobian matrix: dy/dx and returns a list
+
+    :param y: batch_size-by-d matrix
+    :param x: batch_size-by-s tensor
+    :param name:
+    :return:
+    """
+    with tf.name_scope(name):
+        batch_size, d = y.get_shape().as_list()
+        if d == 1:
+            return tf.reshape(tf.gradients(y, x)[0], [batch_size, -1])  # b-by-s
+        else:
+            return tf.transpose(
+                tf.stack(
+                    [tf.reshape(tf.gradients(y[:, i], x)[0], [batch_size, -1]) for i in range(d)], axis=0),  # d-b-s
+                perm=(1, 0, 2))  # b-d-s tensor
+
+
+def jacobian_squared_frobenius_norm(y, x, name='J_fnorm', do_summary=False):
+    """ This function calculates the squared frobenious norm, e.g. sum of square of all elements in Jacobian matrix
+
+    :param y: batch_size-by-d matrix
+    :param x: batch_size-by-s tensor
+    :param name:
+    :param do_summary:
+    :return:
+    """
+    with tf.name_scope(name):
+        batch_size, d = y.get_shape().as_list()
+        # sfn - squared frobenious norm
+        if d == 1:
+            jaco_sfn = tf.reduce_sum(tf.square(tf.reshape(tf.gradients(y, x)[0], [batch_size, -1])), axis=1)
+        else:
+            jaco_sfn = tf.reduce_sum(
+                tf.stack(
+                    [tf.reduce_sum(
+                        tf.square(tf.reshape(tf.gradients(y[:, i], x)[0], [batch_size, -1])),  # b-vector
+                        axis=1) for i in range(d)],
+                    axis=0),  # d-by-b
+                axis=0)  # b-vector
+
+        if do_summary:
+            with tf.name_scope(None):  # return to root scope to avoid scope overlap
+                tf.summary.histogram('Jaco_sfn', jaco_sfn)
+
+        return jaco_sfn
