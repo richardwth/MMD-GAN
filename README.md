@@ -30,7 +30,8 @@ The paper [1] proposed three tricks:
 ![equation](https://latex.codecogs.com/gif.latex?L_D=\sum_{i\ne&space;j}k_D(x_i,x_j)-\sum_{i\ne&space;j}k_D(y_i,y_j))
 
 where ![equation](https://latex.codecogs.com/gif.latex?x_i,x_j) - real samples, ![equation](https://latex.codecogs.com/gif.latex?y_i,y_j) - generated samples, ![equation](https://latex.codecogs.com/gif.latex?k_D) - kernel formed by the discriminator and Gaussian kernel. 
-2. Bounded Gaussian kernel (used only in ![equation](https://latex.codecogs.com/gif.latex?L_D))
+
+2. Bounded kernel (used only in ![equation](https://latex.codecogs.com/gif.latex?L_D))
 For 
 
 In spectral normalization of our paper [1], we directly estimate the spectral norm of a convolution kernel, which empirically is larger than the spectral norm of the reshaped kernel estimated in [2]. Thus, our spectral normalization imposes a stronger penalty than [2]'s. As a result, in our case, the norm of the signal will tend to decrease in each layer because:
