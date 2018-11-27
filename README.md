@@ -29,10 +29,11 @@ The paper [1] proposed three tricks:
 
 ![equation](https://latex.codecogs.com/gif.latex?L_D=\sum_{i\ne&space;j}k_D(x_i,x_j)-\sum_{i\ne&space;j}k_D(y_i,y_j))
 
-where ![equation](https://latex.codecogs.com/gif.latex?x_i,x_j) - real samples, ![equation](https://latex.codecogs.com/gif.latex?y_i,y_j) - generated samples, ![equation](https://latex.codecogs.com/gif.latex?k_D) - kernel formed by the discriminator and Gaussian kernel. 
+where ![equation](https://latex.codecogs.com/gif.latex?\inline&space;x_i,x_j) - real samples, ![equation](https://latex.codecogs.com/gif.latex?\inline&space;y_i,y_j) - generated samples, ![equation](https://latex.codecogs.com/gif.latex?\inline&space;k_D) - kernel formed by the discriminator ![equation](https://latex.codecogs.com/gif.latex?\inline&space;D) and kernel ![equation](https://latex.codecogs.com/gif.latex?\inline&space;k). 
 
 2. Bounded kernel (used only in ![equation](https://latex.codecogs.com/gif.latex?L_D))
-For 
+
+![equation](https://latex.codecogs.com/gif.latex?\inline&space;k_D^{b}(y,y)&space;=\exp(-\frac{1}{2\sigma^2}\max(\left&space;\|&space;D(y_i)-D(y_j)&space;\right&space;\|^2,&space;b_l)))
 
 In spectral normalization of our paper [1], we directly estimate the spectral norm of a convolution kernel, which empirically is larger than the spectral norm of the reshaped kernel estimated in [2]. Thus, our spectral normalization imposes a stronger penalty than [2]'s. As a result, in our case, the norm of the signal will tend to decrease in each layer because:
 - It is unlikely for the signal to coincide with the first eigenvector ("eigentensor") of the convolutional kernel
