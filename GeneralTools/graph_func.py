@@ -628,10 +628,10 @@ def rollback(var_list, ckpt_folder, ckpt_file=None):
     FLAGS.print('Model reloaded.')
     # run the session
     coord = tf.train.Coordinator()
-    threads = tf.train.start_queue_runners(sess=sess, coord=coord)
+    # threads = tf.train.start_queue_runners(sess=sess, coord=coord)
     var_value, global_step_value = sess.run([var_list, global_step])
     coord.request_stop()
-    coord.join(threads)
+    # coord.join(threads)
     sess.close()
     FLAGS.print('Variable calculated.')
 
@@ -702,7 +702,7 @@ class MySession(object):
         if self.summary_writer is not None:
             self.summary_writer.close()
         self.coord.request_stop()
-        self.coord.join(self.threads)
+        # self.coord.join(self.threads)
         self.sess.close()
 
     def _get_saver_(self):
@@ -744,7 +744,7 @@ class MySession(object):
         """
         if self.threads is None:
             self.coord = tf.train.Coordinator()
-            self.threads = tf.train.start_queue_runners(sess=self.sess, coord=self.coord)
+            # self.threads = tf.train.start_queue_runners(sess=self.sess, coord=self.coord)
 
     def run_once(self, var_list, ckpt_folder=None, ckpt_file=None, ckpt_var_list=None, feed_dict=None, do_time=False):
         """ This functions calculates var_list.
@@ -853,7 +853,7 @@ class MySession(object):
                 loss_value, _, _, global_step_value = self.sess.run(
                     [loss_list, op_list, extra_update_ops, global_step])
                 # check if model produces nan outcome
-                assert not np.isnan(loss_value[0]), \
+                assert not any(np.isnan(loss_value)), \
                     'Model diverged with loss = {} at step {}'.format(loss_value, step)
 
                 # add summary and print loss every query step
@@ -887,7 +887,7 @@ class MySession(object):
                 # update the model
                 loss_value, _, _ = self.sess.run([loss_list, update_ops, extra_update_ops])
                 # check if model produces nan outcome
-                assert not np.isnan(loss_value[0]), \
+                assert not any(np.isnan(loss_value)), \
                     'Model diverged with loss = {} at step {}'.format(loss_value, step)
 
                 # add summary and print loss every query step
@@ -921,7 +921,7 @@ class MySession(object):
                 # update the model
                 loss_value, _, _, global_step_value = self.sess.run([loss_list, update_ops, extra_update_ops])
                 # check if model produces nan outcome
-                assert not np.isnan(loss_value[0]), \
+                assert not any(np.isnan(loss_value)), \
                     'Model diverged with loss = {} at step {}'.format(loss_value, step)
 
                 # add summary and print loss every query step
@@ -944,6 +944,33 @@ class MySession(object):
         # calculate sess duration
         duration = time.time() - start_time
         FLAGS.print('Training for {} steps took {:.3f} sec.'.format(max_step, duration))
+
+    def abnormal_save(self, loss_value, global_step_value, summary_op):
+        """ This function save the model in abnormal cases
+
+        :param loss_value:
+        :param global_step_value:
+        :param summary_op:
+        :return:
+        """
+        if any(np.isnan(loss_value)):
+            # save the model
+            if self.saver is not None:
+                self.saver.save(self.sess, save_path=self.save_path, global_step=global_step_value)
+            warnings.warn('Training Stopped due to nan in loss: {}.'.format(loss_value))
+            return True
+        elif any(np.greater(loss_value, 30000)):
+            # save the model
+            if self.saver is not None:
+                self.saver.save(self.sess, save_path=self.save_path, global_step=global_step_value)
+            # add summary
+            if summary_op is not None:
+                summary_str = self.sess.run(summary_op)
+                self.summary_writer.add_summary(summary_str, global_step=global_step_value)
+            warnings.warn('Training Stopped early as loss diverged.')
+            return True
+        else:
+            return False
 
     def debug_mode(self, op_list, loss_list, global_step, summary_op=None, summary_folder=None, ckpt_folder=None,
                    ckpt_file=None, max_step=200, print_loss=True, query_step=100, imbalanced_update=None):
@@ -974,6 +1001,8 @@ class MySession(object):
             run_options = None
             run_metadata = None
             multi_runs_timeline = None
+        if query_step > max_step:
+            query_step = np.minimum(max_step-1, 100)
 
         # run the session
         self._load_ckpt_(ckpt_folder, ckpt_file=ckpt_file)
@@ -998,9 +1027,6 @@ class MySession(object):
                     # update the model
                     loss_value, _, global_step_value, _ = self.sess.run(
                         [loss_list, op_list, global_step, extra_update_ops])
-                # check if model produces nan outcome
-                assert not np.isnan(loss_value[0]), \
-                    'Model diverged with loss = {} at step {}'.format(loss_value, step)
 
                 # print(loss_value) and add summary
                 if global_step_value % query_step == 1:  # at step 0, global step = 1
@@ -1010,14 +1036,8 @@ class MySession(object):
                         summary_str = self.sess.run(summary_op)
                         self.summary_writer.add_summary(summary_str, global_step=global_step_value)
 
-                # conditional save, used in abnormal case
-                if any([lv > 30000 for lv in loss_value]) and (step > 400):
-                    # save the model
-                    self.saver.save(self.sess, save_path=self.save_path, global_step=global_step_value)
-                    # add summary
-                    summary_str = self.sess.run(summary_op)
-                    self.summary_writer.add_summary(summary_str, global_step=global_step_value)
-                    warnings.warn('Training Stopped early as loss diverged.')
+                # in abnormal cases, save the model
+                if self.abnormal_save(loss_value, global_step_value, summary_op):
                     break
 
                 # save the mdl if for loop completes normally
@@ -1048,9 +1068,6 @@ class MySession(object):
                 else:
                     # update the model
                     loss_value, _, _ = self.sess.run([loss_list, update_ops, extra_update_ops])
-                # check if model produces nan outcome
-                assert not np.isnan(loss_value[0]), \
-                    'Model diverged with loss = {} at step {}'.format(loss_value, step)
 
                 # print(loss_value)
                 if print_loss and (step % query_step == 0):
@@ -1062,13 +1079,8 @@ class MySession(object):
                     # add summary and print out loss
                     self.summary_writer.add_summary(summary_str, global_step=global_step_value)
 
-                # conditional save, used in abnormal case
-                if any([lv > 30000 for lv in loss_value]) and (step > 400):
-                    self.saver.save(self.sess, save_path=self.save_path, global_step=global_step_value)
-                    # add summary
-                    summary_str = self.sess.run(summary_op)
-                    self.summary_writer.add_summary(summary_str, global_step=global_step_value)
-                    warnings.warn('Training Stopped early as loss diverged.')
+                # in abnormal cases, save the model
+                if self.abnormal_save(loss_value, global_step_value, summary_op):
                     break
 
                 if step == max_step - 1 and self.saver is not None:
@@ -1099,9 +1111,6 @@ class MySession(object):
                 else:
                     # update the model
                     loss_value, _, _ = self.sess.run([loss_list, update_ops, extra_update_ops])
-                # check if model produces nan outcome
-                assert not np.isnan(loss_value[0]), \
-                    'Model diverged with loss = {} at step {}'.format(loss_value, step)
 
                 # update mmd_average
                 mmd_average = loss_value[2]
@@ -1115,6 +1124,10 @@ class MySession(object):
                     summary_str = self.sess.run(summary_op)
                     # add summary and print out loss
                     self.summary_writer.add_summary(summary_str, global_step=global_step_value)
+
+                # in abnormal cases, save the model
+                if self.abnormal_save(loss_value, global_step_value, summary_op):
+                    break
 
                 if step == max_step - 1 and self.saver is not None:
                     self.saver.save(self.sess, save_path=self.save_path, global_step=global_step_value)
@@ -1194,7 +1207,7 @@ class Agent(object):
             FLAGS.print('Remember to load ckpt to check variable values.')
             with MySession(self.do_save, self.do_trace, self.save_path, self.load_ckpt, self.log_device) as sess:
                 sess.debug_mode(op_list, loss_list, global_step, summary_op, self.summary_folder, self.ckpt_folder,
-                                max_step=self.debug_step, print_loss=self.print_loss,
+                                max_step=self.debug_step, print_loss=self.print_loss, query_step=self.query_step,
                                 imbalanced_update=self.imbalanced_update)
         elif self.debug is False:
             with MySession(self.do_save, self.do_trace, self.save_path, self.load_ckpt) as sess:
