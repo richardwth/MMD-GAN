@@ -41,9 +41,7 @@ where ![equation](https://latex.codecogs.com/gif.latex?\inline&space;x_i,x_j) - 
 
 At iteration t, for convolution kernel ![equation](https://latex.codecogs.com/gif.latex?\inline&space;W_c), do ![equation](https://latex.codecogs.com/gif.latex?\inline&space;u=\text{conv}(W_c,v^t)), ![equation](https://latex.codecogs.com/gif.latex?\inline&space;\hat{v}=\text{transpose-conv}(W_c,u)), and ![equation](https://latex.codecogs.com/gif.latex?\inline&space;v^{t+1}=\hat{v}/\left&space;\|&space;\hat{v}&space;\right&space;\|). The spectral norm is estimated as ![equation](https://latex.codecogs.com/gif.latex?\inline&space;\sigma_W=\left&space;\|&space;u&space;\right&space;\|).
 
-Spectral normalization: at each layer, use ![equation](https://latex.codecogs.com/gif.latex?\inline&space;\hat{W}_c=W_c\cdot&space;\frac{C}{\sigma_W}) for convolution/dense multiplication. The constant C>1 is multiplied after each spectral normalization to compensate for the decreas of signal norm at each layer.
-
-In the main text of paper [1], we used C=1/0.55 empirically. In Appendix C.3, we tested the effects of C on the performance of several loss functions.   
+Spectral normalization is initially proposed in [2]. The idea is, at each layer, to use ![equation](https://latex.codecogs.com/gif.latex?\inline&space;\hat{W}_c=W_c\cdot&space;\frac{C}{\sigma_W}) for convolution/dense multiplication. Here we multiply the signal with a constant C>1 after each spectral normalization to compensate for the decreas of signal norm at each layer. In the main text of paper [1], we used C=1/0.55 empirically. In Appendix C.3, we tested the effects of C on the performance of several loss functions. [2] 
 
 ## Reference
 [1] Improving MMD-GAN Training with Repulsive Loss Function.  Under review as a conference paper at ICLR 2019. URL: https://openreview.net/forum?id=HygjqjR9Km. \
