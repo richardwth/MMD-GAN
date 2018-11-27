@@ -41,17 +41,9 @@ where ![equation](https://latex.codecogs.com/gif.latex?\inline&space;x_i,x_j) - 
 
 At iteration t, for convolution kernel ![equation](https://latex.codecogs.com/gif.latex?\inline&space;W_c), do ![equation](https://latex.codecogs.com/gif.latex?\inline&space;u=\text{conv}(W_c,v^t)), ![equation](https://latex.codecogs.com/gif.latex?\inline&space;\hat{v}=\text{transpose-conv}(W_c,u)), and ![equation](https://latex.codecogs.com/gif.latex?\inline&space;v^{t+1}=\hat{v}/\left&space;\|&space;\hat{v}&space;\right&space;\|). The spectral norm is estimated as ![equation](https://latex.codecogs.com/gif.latex?\inline&space;\sigma_W=\left&space;\|&space;u&space;\right&space;\|).
 
-Spectral normalization: at each layer, use ![equation](https://latex.codecogs.com/gif.latex?\inline&space;\hat{W}_c=W_c\cdot&space;\frac{C}{\sigma_W}) for convolution/dense multiplication.
+Spectral normalization: at each layer, use ![equation](https://latex.codecogs.com/gif.latex?\inline&space;\hat{W}_c=W_c\cdot&space;\frac{C}{\sigma_W}) for convolution/dense multiplication. The constant ![equation](https://latex.codecogs.com/gif.latex?\inline&space;C>1) is multiplied after each spectral normalization to compensate for the decreas of signal norm at each layer.
 
-In spectral normalization of our paper [1], we directly estimate the spectral norm of a convolution kernel, which empirically is larger than the spectral norm of the reshaped kernel estimated in [2]. Thus, our spectral normalization imposes a stronger penalty than [2]'s. As a result, in our case, the norm of the signal will tend to decrease in each layer because:
-- It is unlikely for the signal to coincide with the first eigenvector ("eigentensor") of the convolutional kernel
-- It is likely the activation function (leaky ReLU or ReLU) reduces the norm of the signal. 
-
-Consequently, the discriminator outputs tend to be the same for any inputs (where the outputs are just the biases propagating through the network). Therefore, we found it essential to multiply the signal with a constant **C** > 1 after each spectral normalization (GeneralTools/layer_func Line 822). The GAN performance (using the repulsive loss, MMD loss and hinge loss) seems to be sensitive to **C** as:
-- small **C** may limit the magnitude of model weights and gradients and slow down the training.
-- large **C** reduces the penalty of the spectral norm and may result in unstable training.
-
-I did not mention this in the paper [1] where we used **C**=1.82 empirically. Later I found **C**=![equation](http://latex.codecogs.com/gif.latex?64^{1/L}) seems to provide more stable results across different learning rate combinations, where L is the number of discriminator layers. I will provide more details and discussion on this as soon as I get a chance to revise the paper. 
+In the main text of paper [1], we used ![equation](https://latex.codecogs.com/gif.latex?\inline&space;C=1/0.55) empirically. In Appendix C.3, we tested the effects of C on the performance of several loss functions.   
 
 ## Reference
 [1] Improving MMD-GAN Training with Repulsive Loss Function.  Under review as a conference paper at ICLR 2019. URL: https://openreview.net/forum?id=HygjqjR9Km. \
