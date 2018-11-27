@@ -10,15 +10,26 @@ The code was written along with my learning of Python and GAN and contains many 
 
 For your interest,
 1. DeepLearning/my_sngan/SNGan defines how the model is trained and evaluated. 
-2. GeneralTools/graph_func contains metrics for evaluating generative models (Line 1594). 
-3. GeneralTools/math_func contains spectral normalization (Line 397) and a variety of loss functions for GAN (including the proposed repulsive loss at Line 2501 and 2516).
+2. GeneralTools/graph_func contains metrics for evaluating generative models (Line 1595). 
+3. GeneralTools/math_func contains spectral normalization (Line 397) and a variety of loss functions for GAN (Line 2088). The repulsive loss can be found at Line 2505; the repulsive loss with bounded kernel (referred to as rmb) at Line 2530.
 4. my_test_* contain the model architecture, hyperparameters, and training procedures. 
 
 ### How to use
-1. Modify GeneralTools/misc_func accordingly; download and prepare the datasets.
-2. Run my_test_* with proper hyperparameters
+1. Modify GeneralTools/misc_func accordingly; 
+2. Read Data/ReadMe.md; download and prepare the datasets;
+3. Run my_test_* with proper hyperparameters.
 
 ## About the algorithms
+Here we summarize the algorithms and tricks in case you want to implement the algorithms yourself. 
+
+The paper [1] proposed three tricks:
+1. Repulsive loss
+![equation](https://latex.codecogs.com/gif.latex?L_G=\sum_{i\ne&space;j}k_D(x_i,x_j)-2\sum_{i\ne&space;j}k_D(x_i,y_j)&plus;\sum_{i\ne&space;j}k_D(y_i,y_j))
+![equation](https://latex.codecogs.com/gif.latex?L_D=\sum_{i\ne&space;j}k_D(x_i,x_j)-\sum_{i\ne&space;j}k_D(y_i,y_j))
+where ![equation](https://latex.codecogs.com/gif.latex?x_i,x_j) - real samples, ![equation](https://latex.codecogs.com/gif.latex?y_i,y_j) - generated samples, ![equation](https://latex.codecogs.com/gif.latex?k_D) - kernel formed by the discriminator and Gaussian kernel. 
+2. Bounded Gaussian kernel (used only in ![equation](https://latex.codecogs.com/gif.latex?L_D))
+For 
+
 In spectral normalization of our paper [1], we directly estimate the spectral norm of a convolution kernel, which empirically is larger than the spectral norm of the reshaped kernel estimated in [2]. Thus, our spectral normalization imposes a stronger penalty than [2]'s. As a result, in our case, the norm of the signal will tend to decrease in each layer because:
 - It is unlikely for the signal to coincide with the first eigenvector ("eigentensor") of the convolutional kernel
 - It is likely the activation function (leaky ReLU or ReLU) reduces the norm of the signal. 
