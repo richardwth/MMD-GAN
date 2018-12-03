@@ -54,5 +54,5 @@ Please feel free to contact me if things do not work or suddenly work, or if exp
 ## Reference
 [1] Improving MMD-GAN Training with Repulsive Loss Function.  Under review as a conference paper at ICLR 2019. URL: https://openreview.net/forum?id=HygjqjR9Km. \
 [2] Takeru Miyato, Toshiki Kataoka, Masanori Koyama, and Yuichi Yoshida. Spectral normalization
-for generative adversarial networks. In ICLR, 2018
+for generative adversarial networks. In ICLR, 2018. \
 [3] Martin Heusel, Hubert Ramsauer, Thomas Unterthiner, Bernhard Nessler, and Sepp Hochreiter.  GANs Trained by a Two Time-Scale Update Rule Converge to a Nash Equilibrium. In NIPS, 2017.
