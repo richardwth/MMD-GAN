@@ -720,15 +720,16 @@ def bin2np(
 ########################################################################
 class ReadTFRecords(object):
     def __init__(
-            self, filename, num_features=None, num_labels=0, dtype=tf.string, batch_size=64,
-            skip_count=0, file_repeat=1, num_epoch=None, file_folder=None, num_threads=8,
-            buffer_size=10000, shuffle_file=False):
+            self, filename, num_features=None, num_labels=0, x_dtype=tf.string, y_dtype=tf.int64, batch_size=64,
+            skip_count=0, file_repeat=1, num_epoch=None, file_folder=None,
+            num_threads=8, buffer_size=10000, shuffle_file=False):
         """ This function creates a dataset object that reads data from files.
 
-        :param filename:
-        :param num_features:
+        :param filename: e.g., cifar
+        :param num_features: e.g., 3*64*64
         :param num_labels:
-        :param dtype: default tf.string, the dtype of features stored in tfrecord file
+        :param x_dtype: default tf.string, the dtype of features stored in tfrecord file
+        :param y_dtype:
         :param num_epoch:
         :param buffer_size:
         :param batch_size:
@@ -759,7 +760,8 @@ class ReadTFRecords(object):
         # training information
         self.num_features = num_features
         self.num_labels = num_labels
-        self.dtype = dtype
+        self.x_dtype = x_dtype
+        self.y_dtype = y_dtype
         self.batch_size = batch_size
         self.batch_shape = [self.batch_size, self.num_features]
         self.num_epoch = num_epoch
@@ -780,49 +782,76 @@ class ReadTFRecords(object):
         :return:
         """
         # configure feature and label length
-        x_config = tf.FixedLenFeature([self.num_features], tf.float32) \
-            if self.dtype == tf.float32 else tf.FixedLenFeature([], tf.string)
+        # It is crucial that for tf.string, the length is not specified, as the data is stored as a single string!
+        x_config = tf.FixedLenFeature([], tf.string) \
+            if self.x_dtype == tf.string else tf.FixedLenFeature([self.num_features], self.x_dtype)
         if self.num_labels == 0:
             proto_config = {'x': x_config}
         else:
-            y_config = tf.FixedLenFeature([self.num_labels], tf.int64)
+            y_config = tf.FixedLenFeature([], tf.string) \
+                if self.y_dtype == tf.string else tf.FixedLenFeature([self.num_labels], self.y_dtype)
             proto_config = {'x': x_config, 'y': y_config}
 
         # decode examples
         datum = tf.parse_single_example(example_proto, features=proto_config)
-        if self.dtype == tf.string:  # if input is string / bytes, decode it to float32
-            _temp = tf.decode_raw(datum['x'], tf.uint8)
-            datum['x'] = tf.cast(_temp, tf.float32)
+        if self.x_dtype == tf.string:  # if input is string / bytes, decode it to float32
+            # first decode data to uint8, as data is stored in this way
+            datum['x'] = tf.decode_raw(datum['x'], tf.uint8)
+            # then cast data to tf.float32
+            datum['x'] = tf.cast(datum['x'], tf.float32)
+            # cannot use string_to_number as there is only one string for a whole sample
+            # datum['x'] = tf.strings.to_number(datum['x'], tf.float32)  # this results in possibly a large number
 
         # return data
         if 'y' in datum:
-            # datum['y'] = tf.cast(datum['y'], tf.int32)
+            # y can be present in many ways:
+            # 1. a single integer, which requires y to be int32 or int64 (e.g, used in tf.gather in cbn)
+            # 2. num-class bool/integer/float variables. This form is more flexible as it allows multiple classes and
+            # prior probabilities as targets
+            # 3. float variables in regression problem.
+            # but...
+            # y is stored as int (for case 1), string (for other int cases), or float (for float cases)
+            # in the case of tf.string and tf.int64, convert to to int32
+            if self.y_dtype == tf.string:
+                # avoid using string labels like 'cat', 'dog', use integers instead
+                datum['y'] = tf.decode_raw(datum['y'], tf.uint8)
+                datum['y'] = tf.cast(datum['y'], tf.int32)
+            if self.y_dtype == tf.int64:
+                datum['y'] = tf.cast(datum['y'], tf.int32)
             return datum['x'], datum['y']
         else:
             return datum['x']
 
     ###################################################################
-    def shape2image(self, channels, height, width):
+    def shape2image(self, channels, height, width, resize=None):
         """ This function shapes the input instance to image tensor
 
         :param channels:
         :param height:
         :param width:
+        :param resize: list of tuple
+        :type resize: list, tuple
         :return:
         """
 
         def image_preprocessor(image):
             # scale image to [-1,1]
             image = tf.subtract(tf.divide(image, 127.5), 1)
-            # reshape
+            # reshape - note this is determined by how the data is stored in tfrecords, modify with caution
             image = tf.reshape(image, (channels, height, width)) \
                 if FLAGS.IMAGE_FORMAT == 'channels_first' else tf.reshape(image, (height, width, channels))
+            # resize
+            if isinstance(resize, (list, tuple)):
+                if FLAGS.IMAGE_FORMAT == 'channels_first':
+                    image = tf.transpose(
+                        tf.image.resize_images(  # resize only support HWC
+                            tf.transpose(image, perm=(1, 2, 0)), resize, align_corners=True), perm=(2, 0, 1))
+                else:
+                    image = tf.image.resize_images(image, resize, align_corners=True)
 
             return image
 
-        self.batch_shape = [self.batch_size, height, width, channels] \
-            if FLAGS.IMAGE_FORMAT == 'channels_last' else [self.batch_size, channels, height, width]
-        #
+        # do image pre-processing
         if self.num_labels == 0:
             self.dataset = self.dataset.map(
                 lambda image_data: image_preprocessor(image_data),
@@ -831,6 +860,12 @@ class ReadTFRecords(object):
             self.dataset = self.dataset.map(
                 lambda image_data, label: (image_preprocessor(image_data), label),
                 num_parallel_calls=self.num_threads)
+
+        # write batch shape
+        if isinstance(resize, (list, tuple)):
+            height, width = resize
+        self.batch_shape = [self.batch_size, height, width, channels] \
+            if FLAGS.IMAGE_FORMAT == 'channels_last' else [self.batch_size, channels, height, width]
 
     ###################################################################
     def scheduler(
@@ -892,7 +927,7 @@ class ReadTFRecords(object):
             self.scheduled = True
 
     ###################################################################
-    def next_batch(self, sample_same_class=False, sample_class=None, shuffle_data=True):
+    def next_batch(self, sample_same_class=False, sample_class=None, shuffle_data=True, cast_x=None, cast_y=None):
         """ This function generates next batch
 
         :param sample_same_class: if the data must be sampled from the same class at one iteration
@@ -923,7 +958,6 @@ class ReadTFRecords(object):
                     shuffle_data=shuffle_data, sample_same_class=sample_same_class,
                     sample_class=sample_class)
             x_batch, y_batch = self.iterator.get_next()
-            y_batch = tf.cast(y_batch, tf.int32)
 
             x_batch.set_shape(self.batch_shape)
             y_batch.set_shape([self.batch_size, self.num_labels])
