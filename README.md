@@ -3,7 +3,7 @@ GAN: generative adversarial nets; MMD: maximum mean discrepancy; TF: TensorFlow
 
 This repository contains codes for MMD-GAN and the repulsive loss proposed in the following paper:
 
-[1] Wang, W., Sun, Y., Halgamuge, S . Improving MMD-GAN Training with Repulsive Loss Function. ICLR 2019. URL: https://openreview.net/forum?id=HygjqjR9Km.
+[1] Wei Wang, Yuan Sun, Saman Halgamuge. Improving MMD-GAN Training with Repulsive Loss Function. ICLR 2019. URL: https://openreview.net/forum?id=HygjqjR9Km.
 
 ## About the code
 The code was written along with my learning of Python and GAN and contains many other models I have tried, so I apologize if you find it messy and confusing. The core idea is to define the neural network architecture as dictionaries to quickly test different models.
@@ -52,7 +52,7 @@ In some cases, you may find training using the repulsive loss does not converge.
 Please feel free to contact me if things do not work or suddenly work, or if exploring my code ruins your day. :)
 
 ## Reference
-[1] Wang, W., Sun, Y., Halgamuge, S . Improving MMD-GAN Training with Repulsive Loss Function. ICLR 2019. URL: https://openreview.net/forum?id=HygjqjR9Km. \
+[1] Wei Wang, Yuan Sun, Saman Halgamuge. Improving MMD-GAN Training with Repulsive Loss Function. ICLR 2019. URL: https://openreview.net/forum?id=HygjqjR9Km. \
 [2] Takeru Miyato, Toshiki Kataoka, Masanori Koyama, and Yuichi Yoshida. Spectral normalization
 for generative adversarial networks. In ICLR, 2018. \
 [3] Martin Heusel, Hubert Ramsauer, Thomas Unterthiner, Bernhard Nessler, and Sepp Hochreiter.  GANs Trained by a Two Time-Scale Update Rule Converge to a Nash Equilibrium. In NIPS, 2017.
