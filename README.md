@@ -1,9 +1,7 @@
 # MMD-GAN with Repulsive Loss Function
 GAN: generative adversarial nets; MMD: maximum mean discrepancy; TF: TensorFlow
 
-This repository contains codes for MMD-GAN and the repulsive loss proposed in the following paper:
-
-[1] Wei Wang, Yuan Sun, Saman Halgamuge. Improving MMD-GAN Training with Repulsive Loss Function. ICLR 2019. URL: https://openreview.net/forum?id=HygjqjR9Km.
+This repository contains codes for MMD-GAN and the repulsive loss proposed in ICLR paper [1]:
 
 ## About the code
 The code was written along with my learning of Python and GAN and contains many other models I have tried, so I apologize if you find it messy and confusing. The core idea is to define the neural network architecture as dictionaries to quickly test different models.
