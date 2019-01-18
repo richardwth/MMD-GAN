@@ -1,5 +1,9 @@
 This is to test the gif function...
 
+|: Logical Operators :| <--------------
+|:---:| --- |
+| sdada | assadad |
+
 | | |
 | -- | -- |
 |<img src="https://latex.codecogs.com/gif.latex?\inline&space;L_D^{\text{att}}" title="L_D^{\text{att}}"/> | <img src="https://latex.codecogs.com/gif.latex?\inline&space;L_D^{\text{rep}}" title="L_D^{\text{rep}}"/> |
