@@ -1,2 +1,2 @@
 This is to test the gif function...
-![](0_mmd_d_att.gif)
+![](../Figures/0_mmd_d_att.gif)
