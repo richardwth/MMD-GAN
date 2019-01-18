@@ -6,3 +6,4 @@ This is to test the gif function...
   <figcaption>{{this is caption}}</figcaption>
   <img src="../Figures/0_mmd_d_att.gif" alt="mmd_d_att" width="50%" height="50%">
 </figure>
+*image_caption*
