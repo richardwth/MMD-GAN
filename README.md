@@ -61,6 +61,8 @@ We recommend using the following tricks.
 2. Two time-scale update rule (TTUR) [4]. The idea is to use different learning rates for the generator and discriminator. 
 
 ### Final Comments
+Thank you for reading!
+
 In some cases, you may find training using the repulsive loss does not converge. Do not panic. It may be that the learning rate is not suitable. Please try other learning rate or the bounded kernel. 
 
 Please feel free to contact me if things do not work or suddenly work, or if exploring my code ruins your day. :)
