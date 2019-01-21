@@ -49,7 +49,7 @@ We argue that <img src="https://latex.codecogs.com/gif.latex?\inline&space;L_D^{
 
 ![equation](https://latex.codecogs.com/gif.latex?\inline&space;k_D^{b}(y_i,y_j)&space;=\exp(-\frac{1}{2\sigma^2}\max(\left&space;\|&space;D(y_i)-D(y_j)&space;\right&space;\|^2,&space;b_l)))
 
-Gaussian kernel gives near 0 gradients when the input distance is too small or large. The bounded kernel avoids kernel saturation by truncating the two tails of distance distribution, an idea inspired by the hinge loss. This prevents the discriminator from becoming too confident. 
+The gradient of Gaussian kernel is near 0 when the input distance is too small or large. The bounded kernel avoids kernel saturation by truncating the two tails of distance distribution, an idea inspired by the hinge loss. This prevents the discriminator from becoming too confident.  
 
 3. Power iteration for convolution (used in spectral normalization)
 
