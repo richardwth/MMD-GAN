@@ -1,4 +1,4 @@
-Below is an illustration of the effects of MMD losses on free particles ####(or discriminator outputs of samples if for illustration purpose we allow them to move freely). 
+Below is an illustration of the effects of MMD losses on free particles ####(or discriminator outputs of samples if for illustration purpose we allow them to move freely). ####
 
 | | |
 | :---: | :---: |
