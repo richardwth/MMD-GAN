@@ -57,9 +57,10 @@ At last, we proposed a method to calculate the spectral norm of convolution kern
 
 ### Practical Tricks and Issues
 We recommend using the following tricks.
-1. Spectral normalization, initially proposed in [3]. The idea is, at each layer, to use ![equation](https://latex.codecogs.com/gif.latex?\inline&space;\hat{W}_c=W_c\cdot&space;\frac{C}{\sigma_W}) for convolution/dense multiplication. Here we multiply the signal with a constant C>1 after each spectral normalization to compensate for the decrease of signal norm at each layer. In the main text of paper [1], we used C=1/0.55 empirically. In Appendix C.3, we tested a variety of C values.
+1. Spectral normalization, initially proposed in [3]. The idea is, at each layer, to use ![equation](https://latex.codecogs.com/gif.latex?\inline&space;\hat{W}_c=W_c\cdot&space;\frac{C}{\sigma_W}) for convolution/dense multiplication. Here we multiply the signal with a constant <img src="https://latex.codecogs.com/gif.latex?\inline&space;C>1" title="C>1"/> after each spectral normalization to compensate for the decrease of signal norm at each layer. In the main text of paper [1], we used <img src="https://latex.codecogs.com/gif.latex?\inline&space;C=1/0.55" title="C=1/0.55"/> empirically. In Appendix C.3, we tested a variety of <img src="https://latex.codecogs.com/gif.latex?\inline&space;C" title="C"/> values.
 2. Two time-scale update rule (TTUR) [4]. The idea is to use different learning rates for the generator and discriminator. 
 
+### Final Comments
 In some cases, you may find training using the repulsive loss does not converge. Do not panic. It may be that the learning rate is not suitable. Please try other learning rate or the bounded kernel. 
 
 Please feel free to contact me if things do not work or suddenly work, or if exploring my code ruins your day. :)
