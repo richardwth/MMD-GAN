@@ -35,7 +35,7 @@ The paper [1] proposed three methods:
 
 where ![equation](https://latex.codecogs.com/gif.latex?\inline&space;x_i,x_j) - real samples, ![equation](https://latex.codecogs.com/gif.latex?\inline&space;y_i,y_j) - generated samples, ![equation](https://latex.codecogs.com/gif.latex?\inline&space;k_D) - kernel formed by the discriminator ![equation](https://latex.codecogs.com/gif.latex?\inline&space;D) and kernel ![equation](https://latex.codecogs.com/gif.latex?\inline&space;k). The discriminator loss of previous MMD-GAN [2], or what we called attractive loss, is ![equation](https://latex.codecogs.com/gif.latex?\inline&space;L_D^{\text{att}}=-L_G). 
 
-Below is an illustration of the effects of MMD losses on free R(eal) and G(enerated) particles (code in Figures folder). The particles stand for discriminator outputs of samples, but, for illustration purpose, we allow them to move freely. These GIFs extend the Figure 1 in [1].
+Below is an illustration of the effects of MMD losses on free R(eal) and G(enerated) particles (code in Figures folder). The particles stand for discriminator outputs of samples, but, for illustration purpose, we allow them to move freely. These GIFs extend the Figure 1 of paper [1].
 
 | | |
 | :---: | :---: |
@@ -62,7 +62,7 @@ At last, we proposed a method to calculate the spectral norm of convolution kern
 
 ### Practical Tricks and Issues
 We recommend using the following tricks.
-1. Spectral normalization, initially proposed in [3]. The idea is, at each layer, to use ![equation](https://latex.codecogs.com/gif.latex?\inline&space;\hat{W}_c=W_c\cdot&space;\frac{C}{\sigma_W}) for convolution/dense multiplication. Here we multiply the signal with a constant <img src="https://latex.codecogs.com/gif.latex?\inline&space;C>1" title="C>1"/> after each spectral normalization to compensate for the decrease of signal norm at each layer. In the main text of paper [1], we used <img src="https://latex.codecogs.com/gif.latex?\inline&space;C=1/0.55" title="C=1/0.55"/> empirically. In Appendix C.3, we tested a variety of <img src="https://latex.codecogs.com/gif.latex?\inline&space;C" title="C"/> values.
+1. Spectral normalization, initially proposed in [3]. The idea is, at each layer, to use ![equation](https://latex.codecogs.com/gif.latex?\inline&space;\hat{W}_c=W_c\cdot&space;\frac{C}{\sigma_W}) for convolution/dense multiplication. Here we multiply the signal with a constant <img src="https://latex.codecogs.com/gif.latex?\inline&space;C>1" title="C>1"/> after each spectral normalization to compensate for the decrease of signal norm at each layer. In the main text of paper [1], we used <img src="https://latex.codecogs.com/gif.latex?\inline&space;C=1/0.55" title="C=1/0.55"/> empirically. In Appendix C.3 of paper [1], we tested a variety of <img src="https://latex.codecogs.com/gif.latex?\inline&space;C" title="C"/> values.
 2. Two time-scale update rule (TTUR) [4]. The idea is to use different learning rates for the generator and discriminator.
 
 In some cases, you may find training using the repulsive loss does not converge. Do not panic. It may be that the learning rate is not suitable. Please try other learning rate or the bounded kernel. 
