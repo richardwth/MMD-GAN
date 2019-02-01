@@ -33,9 +33,9 @@ The paper [1] proposed three methods:
 
 ![equation](https://latex.codecogs.com/gif.latex?\inline&space;L_D^{\text{rep}}=\sum_{i\ne&space;j}k_D(x_i,x_j)-\sum_{i\ne&space;j}k_D(y_i,y_j))
 
-where ![equation](https://latex.codecogs.com/gif.latex?\inline&space;x_i,x_j) - real samples, ![equation](https://latex.codecogs.com/gif.latex?\inline&space;y_i,y_j) - generated samples, ![equation](https://latex.codecogs.com/gif.latex?\inline&space;k_D) - kernel formed by the discriminator ![equation](https://latex.codecogs.com/gif.latex?\inline&space;D) and kernel ![equation](https://latex.codecogs.com/gif.latex?\inline&space;k). 
+where ![equation](https://latex.codecogs.com/gif.latex?\inline&space;x_i,x_j) - real samples, ![equation](https://latex.codecogs.com/gif.latex?\inline&space;y_i,y_j) - generated samples, ![equation](https://latex.codecogs.com/gif.latex?\inline&space;k_D) - kernel formed by the discriminator ![equation](https://latex.codecogs.com/gif.latex?\inline&space;D) and kernel ![equation](https://latex.codecogs.com/gif.latex?\inline&space;k). The discriminator loss of previous MMD-GAN [2], or what we called attractive loss, is ![equation](https://latex.codecogs.com/gif.latex?\inline&space;L_D^{\text{att}}=-L_G). 
 
-The discriminator loss of previous MMD-GAN [2], or what we called attractive loss, is ![equation](https://latex.codecogs.com/gif.latex?\inline&space;L_D^{\text{att}}=-L_G). Below is an illustration of the effects of MMD losses on free R(eal) and G(enerated) particles (code in Figures folder). The particles stand for discriminator outputs of samples, but, for illustration purpose, we allow them to move freely. These GIFs extend the Figure 1 in [1].
+Below is an illustration of the effects of MMD losses on free R(eal) and G(enerated) particles (code in Figures folder). The particles stand for discriminator outputs of samples, but, for illustration purpose, we allow them to move freely. These GIFs extend the Figure 1 in [1].
 
 | | |
 | :---: | :---: |
