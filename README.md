@@ -8,19 +8,19 @@ Wei Wang, Yuan Sun, Saman Halgamuge. Improving MMD-GAN Training with Repulsive L
 The code defines the neural network architecture as dictionaries and strings to ease test of different models. It also contains many other models I have tried, so sorry if you find it a little bit confusing.
 
 The structure of code:
-1. DeepLearning/my_sngan/SNGan defines how a general GAN model is trained and evaluated. 
-2. GeneralTools contains various tools:
-    1. graph_func contains functions to run a model graph and metrics for evaluating generative models (Line 1595).
-    2. input_func contains functions to handle datasets and input pipeline.
-    3. layer_func contains functions to convert network architecture dictionary to operations
-    4. math_func defines various mathematical operations. You may find spectral normalization at Line 397, loss functions for GAN at Line 2088, repulsive loss at Line 2505, repulsive with bounded kernel (referred to as rmb) at Line 2530.
-    5. misc_fun contains FLAGS for the code.
-3. my_test_* contain the specific model architectures and hyperparameters. 
+1. _DeepLearning/my_sngan/SNGan_ defines how a general GAN model is trained and evaluated. 
+2. _GeneralTools_ contains various tools:
+    1. _graph_func_ contains functions to run a model graph and metrics for evaluating generative models (Line 1595).
+    2. _input_func_ contains functions to handle datasets and input pipeline.
+    3. _layer_func_ contains functions to convert network architecture dictionary to operations
+    4. _math_func_ defines various mathematical operations. You may find spectral normalization at Line 397, loss functions for GAN at Line 2088, repulsive loss at Line 2505, repulsive with bounded kernel (referred to as rmb) at Line 2530.
+    5. _misc_fun_ contains FLAGs for the code.
+3. *my_test_* contain the specific model architectures and hyperparameters. 
 
 ### Running the tests
-1. Modify GeneralTools/misc_func accordingly; 
-2. Read Data/ReadMe.md; download and prepare the datasets;
-3. Run my_test_* with proper hyperparameters.
+1. Modify _GeneralTools/misc_func_ accordingly; 
+2. Read _Data/ReadMe.md_; download and prepare the datasets;
+3. Run *my_test_* with proper hyperparameters.
 
 ## About the algorithms
 Here we introduce the algorithms and tricks. 
@@ -35,7 +35,7 @@ The paper [1] proposed three methods:
 
 where ![equation](https://latex.codecogs.com/gif.latex?\inline&space;x_i,x_j) - real samples, ![equation](https://latex.codecogs.com/gif.latex?\inline&space;y_i,y_j) - generated samples, ![equation](https://latex.codecogs.com/gif.latex?\inline&space;k_D) - kernel formed by the discriminator ![equation](https://latex.codecogs.com/gif.latex?\inline&space;D) and kernel ![equation](https://latex.codecogs.com/gif.latex?\inline&space;k). The discriminator loss of previous MMD-GAN [2], or what we called attractive loss, is ![equation](https://latex.codecogs.com/gif.latex?\inline&space;L_D^{\text{att}}=-L_G). 
 
-Below is an illustration of the effects of MMD losses on free R(eal) and G(enerated) particles (code in Figures folder). The particles stand for discriminator outputs of samples, but, for illustration purpose, we allow them to move freely. These GIFs extend the Figure 1 of paper [1].
+Below is an illustration of the effects of MMD losses on free R(eal) and G(enerated) particles (code in _Figures_ folder). The particles stand for discriminator outputs of samples, but, for illustration purpose, we allow them to move freely. These GIFs extend the Figure 1 of paper [1].
 
 | | |
 | :---: | :---: |
