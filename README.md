@@ -12,8 +12,8 @@ The structure of code:
 2. GeneralTools contains various tools:
     1. graph_func contains functions to run a model graph and metrics for evaluating generative models (Line 1595).
     2. input_func contains functions to handle datasets and input pipeline.
-    3. layer_func contains functions to convert network architecture dictionary to various operations
-    4. math_func defines all kinds of mathematical operations. You may find spectral normalization at Line 397, various loss functions for GAN at Line 2088, repulsive loss at Line 2505, repulsive with bounded kernel (referred to as rmb) at Line 2530.
+    3. layer_func contains functions to convert network architecture dictionary to operations
+    4. math_func defines various mathematical operations. You may find spectral normalization at Line 397, various loss functions for GAN at Line 2088, repulsive loss at Line 2505, repulsive with bounded kernel (referred to as rmb) at Line 2530.
     5. misc_fun contains FLAGS for the code.
 3. my_test_* contain the specific model architectures and hyperparameters. 
 
