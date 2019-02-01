@@ -70,7 +70,7 @@ In some cases, you may find training using the repulsive loss does not converge.
 ### Final Comments
 Thank you for reading!
 
-Please feel free to contact me if things do not work or suddenly work, or if exploring my code ruins your day. :)
+Please feel free to leave comments if things do not work or suddenly work, or if exploring my code ruins your day. :)
 
 ## Reference
 [1] Wei Wang, Yuan Sun, Saman Halgamuge. Improving MMD-GAN Training with Repulsive Loss Function. ICLR 2019. URL: https://openreview.net/forum?id=HygjqjR9Km. \
