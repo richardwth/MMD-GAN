@@ -1,24 +1,29 @@
 # MMD-GAN with Repulsive Loss Function
 GAN: generative adversarial nets; MMD: maximum mean discrepancy; TF: TensorFlow
 
-This repository contains codes for MMD-GAN and the repulsive loss proposed in ICLR paper [1].
+This repository contains codes for MMD-GAN and the repulsive loss proposed in ICLR paper [1]: \
+Wei Wang, Yuan Sun, Saman Halgamuge. Improving MMD-GAN Training with Repulsive Loss Function. ICLR 2019. URL: https://openreview.net/forum?id=HygjqjR9Km.
 
 ## About the code
-The code was written along with my learning of Python and GAN and contains many other models I have tried, so I apologize if you find it messy and confusing. The core idea is to define the neural network architecture as dictionaries to quickly test different models.
+The code defines the neural network architecture as dictionaries and strings to ease test of a variety of models. It also contains many other models I have tried, so sorry if you find it a little bit confusing.
 
-For your interest,
-1. DeepLearning/my_sngan/SNGan defines how the model is trained and evaluated. 
-2. GeneralTools/graph_func contains metrics for evaluating generative models (Line 1595). 
-3. GeneralTools/math_func contains spectral normalization (Line 397) and a variety of loss functions for GAN (Line 2088). The repulsive loss can be found at Line 2505; the repulsive loss with bounded kernel (referred to as rmb) at Line 2530.
-4. my_test_* contain the model architecture, hyperparameters, and training procedures. 
+The structure of code:
+1. DeepLearning/my_sngan/SNGan defines how a general GAN model is trained and evaluated. 
+2. GeneralTools contains various tools:
+    1. graph_func contains functions to run a model graph and metrics for evaluating generative models (Line 1595).
+    2. input_func contains functions to handle datasets and input pipeline.
+    3. layer_func contains functions to convert network architecture dictionary to various operations
+    4. math_func defines all kinds of mathematical operations. You may find spectral normalization at Line 397, various loss functions for GAN at Line 2088, repulsive loss at Line 2505, repulsive with bounded kernel (referred to as rmb) at Line 2530.
+    5. misc_fun contains FLAGS for the code.
+3. my_test_* contain the specific model architectures and hyperparameters. 
 
-### How to use
+### Running the tests
 1. Modify GeneralTools/misc_func accordingly; 
 2. Read Data/ReadMe.md; download and prepare the datasets;
 3. Run my_test_* with proper hyperparameters.
 
 ## About the algorithms
-Here we introduce the algorithms and tricks in case you would like to implement the algorithms yourself. 
+Here we introduce the algorithms and tricks. 
 
 ### Proposed Methods
 The paper [1] proposed three methods:
