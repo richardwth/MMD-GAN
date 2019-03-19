@@ -17,7 +17,7 @@ import os
 import os.path
 import sys
 import time
-import warnings
+# import warnings
 # from PIL import Image  # PIL is not available on Spartan
 # default modules
 import numpy as np
@@ -108,233 +108,233 @@ def binary_image_to_tfrecords(
         image_path, output_filename, num_images, image_size, num_labels=1, label_first=True,
         resize=None, crop=None, image_transpose=False, image_format_in_file='NCHW',
         target_image_format='NCHW', save_label=False):
-    """ This function converts images stored in image_path.bin to target_path.tfrecords. It assumes RGB images.
+        """ This function converts images stored in image_path.bin to target_path.tfrecords. It assumes RGB images.
 
-    Note: label is not written to tfrecord
+        Note: label is not written to tfrecord
 
-    For stl10 dataset, the following code is used:
-        from GeneralTools.input_func import binary_image_to_tfrecords
+        For stl10 dataset, the following code is used:
+            from GeneralTools.input_func import binary_image_to_tfrecords
 
-        binary_image_to_tfrecords(
-            'stl10/unlabeled_X', 'stl_NCHW/stl', 100000, [3, 96, 96],
-            num_labels=0, resize=(48, 48), image_transpose=True,
-            image_format_in_file='NCHW', target_image_format='NCHW')
+            binary_image_to_tfrecords(
+                'stl10/unlabeled_X', 'stl_NCHW/stl', 100000, [3, 96, 96],
+                num_labels=0, resize=(48, 48), image_transpose=True,
+                image_format_in_file='NCHW', target_image_format='NCHW')
 
-    For cifar10 dataset, the following code is used:
-        from GeneralTools.misc_fun import FLAGS
-        FLAGS.DEFAULT_DOWNLOAD = '/media/richard/My Book/MyBackup/Data/'
-        from GeneralTools.input_func import binary_image_to_tfrecords
+        For cifar10 dataset, the following code is used:
+            from GeneralTools.misc_fun import FLAGS
+            FLAGS.DEFAULT_DOWNLOAD = '/media/richard/My Book/MyBackup/Data/'
+            from GeneralTools.input_func import binary_image_to_tfrecords
 
-        filename = ['cifar/cifar_{}'.format(i) for i in range(1, 6)]
-        binary_image_to_tfrecords(
-            filename, 'cifar_NCHW/cifar', 50000, [3, 32, 32], num_labels=1,
-            image_format_in_file='NCHW', target_image_format='NCHW')
+            filename = ['cifar/cifar_{}'.format(i) for i in range(1, 6)]
+            binary_image_to_tfrecords(
+                filename, 'cifar_NCHW/cifar', 50000, [3, 32, 32], num_labels=1,
+                image_format_in_file='NCHW', target_image_format='NCHW')
 
 
-    :param image_path: e.g. stl10/unlabeled_X (in DEFAULT_DOWNLOAD_FILE_DIR)
-    :param output_filename: e.g. stl10_NCHW/stl (in DEFAULT_IN_FILE_DIR)
-    :param num_images: integer, e.g. 100000
-    :param image_size: [num_channels, height, weight]
-    :param num_labels: num of labels for each instance; if no label, set label_bytes = 0
-    :param label_first: if data is stored as [label, feature] or [feature, label]
-    :param resize: (new_height, new_weight)
-    :param crop: e.g. (36-32, 44-32, 36+32, 44+32)
-    :param image_transpose: in datasets like MNIST and stl10, the height and weight dimensions are reversed
-    :param image_format_in_file:
-    :param target_image_format:
-    :param save_label: bool
-    :return:
-    """
-    from PIL import Image
-
-    def do_image_resize(im):
-        """ This function resizes the input image
-
-        :param im: an image in numpy array
+        :param image_path: e.g. stl10/unlabeled_X (in DEFAULT_DOWNLOAD_FILE_DIR)
+        :param output_filename: e.g. stl10_NCHW/stl (in DEFAULT_IN_FILE_DIR)
+        :param num_images: integer, e.g. 100000
+        :param image_size: [num_channels, height, weight]
+        :param num_labels: num of labels for each instance; if no label, set label_bytes = 0
+        :param label_first: if data is stored as [label, feature] or [feature, label]
+        :param resize: (new_height, new_weight)
+        :param crop: e.g. (36-32, 44-32, 36+32, 44+32)
+        :param image_transpose: in datasets like MNIST and stl10, the height and weight dimensions are reversed
+        :param image_format_in_file:
+        :param target_image_format:
+        :param save_label: bool
         :return:
         """
-        # convert ndarray to im object and do resize
-        im = Image.fromarray(im, 'RGB')
-        im = im.resize(resize, Image.LANCZOS)
-        return np.array(im)
+        from PIL import Image
 
-    def do_image_crop(np_image):
-        """ This function crops the input image
+        def do_image_resize(im):
+            """ This function resizes the input image
 
-        :param np_image:
-        :return:
-        """
-        # convert ndarray to im object and do crop
-        im = Image.fromarray(np_image, 'RGB')
-        im = im.crop(crop)
-        return np.array(im)
+            :param im: an image in numpy array
+            :return:
+            """
+            # convert ndarray to im object and do resize
+            im = Image.fromarray(im, 'RGB')
+            im = im.resize(resize, Image.LANCZOS)
+            return np.array(im)
 
-    # check inputs
-    if isinstance(image_size, tuple):
-        image_size = list(image_size)
-    # read data into numpy
-    num_features = image_size[0] * image_size[1] * image_size[2]
-    start_time = time.time()
-    data = bin2np(
-        image_path, num_images, num_features=num_features, num_labels=num_labels, label_first=label_first,
-        target_feature_type=tf.uint8, target_label_type=tf.int64)
-    if num_labels > 0:
-        images, labels = data
-    else:
-        save_label = False
-        images = data
-        labels = None
+        def do_image_crop(np_image):
+            """ This function crops the input image
 
-    # reshape and do transpose to NHWC
-    if image_format_in_file in {'channels_first', 'NCHW'}:
-        images = np.reshape(images, [num_images] + image_size)
-        images = np.transpose(images, (0, 2, 3, 1))
-    elif image_format_in_file in {'channels_last', 'NHWC'}:
-        image_size = [image_size[1], image_size[2], image_size[0]]
-        images = np.reshape(images, [num_images] + image_size)
-    if image_transpose:  # in datasets like MNIST and stl10, the height and weight dimensions are reversed
-        images = np.transpose(images, (0, 2, 1, 3))
-    # show an example
-    image0 = Image.fromarray(images[0], 'RGB')
-    image0.show('A image')
+            :param np_image:
+            :return:
+            """
+            # convert ndarray to im object and do crop
+            im = Image.fromarray(np_image, 'RGB')
+            im = im.crop(crop)
+            return np.array(im)
 
-    # resize and crop
-    if resize is not None:
-        images = np.array(list(map(lambda single_image: do_image_resize(single_image), images)))
+        # check inputs
+        if isinstance(image_size, tuple):
+            image_size = list(image_size)
+        # read data into numpy
+        num_features = image_size[0] * image_size[1] * image_size[2]
+        start_time = time.time()
+        data = bin2np(
+            image_path, num_images, num_features=num_features, num_labels=num_labels, label_first=label_first,
+            target_feature_type=tf.uint8, target_label_type=tf.int64)
+        if num_labels > 0:
+            images, labels = data
+        else:
+            save_label = False
+            images = data
+            labels = None
+
+        # reshape and do transpose to NHWC
+        if image_format_in_file in {'channels_first', 'NCHW'}:
+            images = np.reshape(images, [num_images] + image_size)
+            images = np.transpose(images, (0, 2, 3, 1))
+        elif image_format_in_file in {'channels_last', 'NHWC'}:
+            image_size = [image_size[1], image_size[2], image_size[0]]
+            images = np.reshape(images, [num_images] + image_size)
+        if image_transpose:  # in datasets like MNIST and stl10, the height and weight dimensions are reversed
+            images = np.transpose(images, (0, 2, 1, 3))
+        # show an example
         image0 = Image.fromarray(images[0], 'RGB')
-        image0.show('Resize')
-    if crop is not None:
-        images = np.array(list(map(lambda single_image: do_image_crop(single_image), images)))
-        image0 = Image.fromarray(images[0], 'RGB')
-        image0.show('Crop')
-    # transpose to NCHW if required
-    if target_image_format in {'channels_first', 'NCHW'}:
-        images = np.transpose(images, (0, 3, 1, 2))
-    # flatten the data
-    dataset = np.reshape(images, [num_images, -1])
-    duration = time.time() - start_time
-    print('Reading image file took {:.1f} seconds'.format(duration))
+        image0.show('A image')
 
-    # # save to tfrecord
-    print('Images writing to tfrecord in process.')
-    start_time = time.time()
-    if save_label:
-        my_np2tfrecord(output_filename, dataset, labels)
-    else:
-        my_np2tfrecord(output_filename, dataset)
-    duration = time.time() - start_time
-    print('Writing tfrecord file took {:.1f} seconds'.format(duration))
+        # resize and crop
+        if resize is not None:
+            images = np.array(list(map(lambda single_image: do_image_resize(single_image), images)))
+            image0 = Image.fromarray(images[0], 'RGB')
+            image0.show('Resize')
+        if crop is not None:
+            images = np.array(list(map(lambda single_image: do_image_crop(single_image), images)))
+            image0 = Image.fromarray(images[0], 'RGB')
+            image0.show('Crop')
+        # transpose to NCHW if required
+        if target_image_format in {'channels_first', 'NCHW'}:
+            images = np.transpose(images, (0, 3, 1, 2))
+        # flatten the data
+        dataset = np.reshape(images, [num_images, -1])
+        duration = time.time() - start_time
+        print('Reading image file took {:.1f} seconds'.format(duration))
+
+        # # save to tfrecord
+        print('Images writing to tfrecord in process.')
+        start_time = time.time()
+        if save_label:
+            my_np2tfrecord(output_filename, dataset, labels)
+        else:
+            my_np2tfrecord(output_filename, dataset)
+        duration = time.time() - start_time
+        print('Writing tfrecord file took {:.1f} seconds'.format(duration))
 
 
 #######################################################################
 def raw_image_to_tfrecords(
         image_folder, output_filename, resize=None, crop=None, save_image=False, save_folder=None,
         image_file_extension='png', num_images_per_tfrecord=20000, image_format=None):
-    """ This function reads images in the image_folder and write it into tfrecords (20000 images per tfrecord).
+        """ This function reads images in the image_folder and write it into tfrecords (20000 images per tfrecord).
 
-    This function is based on the script from
-    https://github.com/tensorflow/models/blob/master/research/real_nvp/lsun_formatting.py
+        This function is based on the script from
+        https://github.com/tensorflow/models/blob/master/research/real_nvp/lsun_formatting.py
 
-    Unlike raw_image_to_csv, this function allows irregular image file names that cannot be simply indexed, e.g.
-    'a908f9211863fa04f7d9b2b3212b3cec5d6d609a.webp'; it also allows irregular image size that may change for each
-    image; however, in this case:
-    1. either height or width will be downscaled to the required size, depending on which scaling factor is smaller
-    2. only center crop can be used.
+        Unlike raw_image_to_csv, this function allows irregular image file names that cannot be simply indexed, e.g.
+        'a908f9211863fa04f7d9b2b3212b3cec5d6d609a.webp'; it also allows irregular image size that may change for each
+        image; however, in this case:
+        1. either height or width will be downscaled to the required size, depending on which scaling factor is smaller
+        2. only center crop can be used.
 
-    For celebA dataset, the following code is used: (original image size 178*218, number 22511*9)
-        from GeneralTools.input_func import raw_image_to_tfrecords
-        image_folder = 'celebA/img_align_celeba_png'
-        output_filename = 'celebA_NCHW/celebA'
-        raw_image_to_tfrecords(
-            image_folder, output_filename, resize=(72, 88), crop=(64, 64),
-            num_images_per_tfrecord=22511, image_format='NCHW')
+        For celebA dataset, the following code is used: (original image size 178*218, number 22511*9)
+            from GeneralTools.input_func import raw_image_to_tfrecords
+            image_folder = 'celebA/img_align_celeba_png'
+            output_filename = 'celebA_NCHW/celebA'
+            raw_image_to_tfrecords(
+                image_folder, output_filename, resize=(72, 88), crop=(64, 64),
+                num_images_per_tfrecord=22511, image_format='NCHW')
 
-    For lsun dataset, the following code is used: (original image size 225*? or ?*225, number 3033042)
-        from GeneralTools.input_func import raw_image_to_tfrecords
-        image_folder = 'LSUN/tr'
-        output_filename = 'lsun_NCHW/lsun'
-        raw_image_to_tfrecords(
-            image_folder, output_filename, resize=(64, 64), crop=(64, 64),
-            image_file_extension='webp', num_images_per_tfrecord=49722, image_format='NCHW')
+        For lsun dataset, the following code is used: (original image size 225*? or ?*225, number 3033042)
+            from GeneralTools.input_func import raw_image_to_tfrecords
+            image_folder = 'LSUN/tr'
+            output_filename = 'lsun_NCHW/lsun'
+            raw_image_to_tfrecords(
+                image_folder, output_filename, resize=(64, 64), crop=(64, 64),
+                image_file_extension='webp', num_images_per_tfrecord=49722, image_format='NCHW')
 
-    :param image_folder: e.g. 'celebA/img_align_celeba_png' (in DEFAULT_DOWNLOAD_FILE_DIR)
-    :param output_filename: e.g. stl10_NCHW/stl (in DEFAULT_IN_FILE_DIR)
-    :param resize: (height, width)
-    :param crop: (height, width), center crop is used
-    :param save_image:
-    :param save_folder:
-    :param image_file_extension: 'webp', 'png', etc
-    :param num_images_per_tfrecord:
-    :param image_format: the image format in tfrecords, if None, check misc_fun.FLAGS.IMAGE_FORMAT
-    :return:
-    """
-    from PIL import Image
+        :param image_folder: e.g. 'celebA/img_align_celeba_png' (in DEFAULT_DOWNLOAD_FILE_DIR)
+        :param output_filename: e.g. stl10_NCHW/stl (in DEFAULT_IN_FILE_DIR)
+        :param resize: (height, width)
+        :param crop: (height, width), center crop is used
+        :param save_image:
+        :param save_folder:
+        :param image_file_extension: 'webp', 'png', etc
+        :param num_images_per_tfrecord:
+        :param image_format: the image format in tfrecords, if None, check misc_fun.FLAGS.IMAGE_FORMAT
+        :return:
+        """
+        from PIL import Image
 
-    # get image format
-    if image_format is None:
-        image_format = FLAGS.IMAGE_FORMAT
-    # prepare folders
-    image_folder = os.path.join(DEFAULT_DOWNLOAD_FILE_DIR, image_folder)
-    output_filename = os.path.join(DEFAULT_IN_FILE_DIR, output_filename)
-    if save_image:
-        if save_folder is None:
-            save_folder = image_folder + '_copy'
-        save_folder = os.path.join(DEFAULT_DOWNLOAD_FILE_DIR, save_folder)
-
-    # get the list of image file names
-    image_filename_list = os.listdir(image_folder)
-    image_filename_list = [img_fn for img_fn in image_filename_list if img_fn.endswith('.' + image_file_extension)]
-    num_images = len(image_filename_list)
-    print('Number of images: {}'.format(num_images))
-    # iteratively handle each image
-    writer = None
-    start_time = time.time()
-    for image_index, image_filename in enumerate(image_filename_list):
-        # configure the tfrecord file to write
-        if image_index % num_images_per_tfrecord == 0:
-            file_out = "{}_{:03d}.tfrecords".format(output_filename, image_index // num_images_per_tfrecord)
-            # print("Writing on:", file_out)
-            writer = tf.python_io.TFRecordWriter(file_out)
-
-        # read image
-        im = Image.open(os.path.join(image_folder, image_filename))
-        # resize and crop the image
-        if resize is not None:
-            height, width = im.size
-            factor = min(height / resize[0], width / resize[1])
-            im = im.resize((int(height / factor), int(width / factor)), Image.LANCZOS)
-        if crop is not None:
-            height, width = im.size
-            h_offset = int((height - crop[0]) / 2)
-            w_offset = int((width - crop[1]) / 2)
-            box = (h_offset, w_offset, h_offset + crop[0], w_offset + crop[1])
-            im = im.crop(box)
-        # save image if needed
+        # get image format
+        if image_format is None:
+            image_format = FLAGS.IMAGE_FORMAT
+        # prepare folders
+        image_folder = os.path.join(DEFAULT_DOWNLOAD_FILE_DIR, image_folder)
+        output_filename = os.path.join(DEFAULT_IN_FILE_DIR, output_filename)
         if save_image:
-            image_save_file = os.path.join(save_folder, '%07d.png' % image_index)
-            im.save(image_save_file)
+            if save_folder is None:
+                save_folder = image_folder + '_copy'
+            save_folder = os.path.join(DEFAULT_DOWNLOAD_FILE_DIR, save_folder)
 
-        # if image not RGB format, convert to rbg
-        if im.mode != 'RGB':
-            im = im.convert('RGB')
-        # if image format is channels_first, transpose im
-        if image_format in {'channels_first', 'NCHW'}:
-            im = np.array(im, dtype=np.uint8)
-            im = np.transpose(im, axes=(2, 0, 1))
+        # get the list of image file names
+        image_filename_list = os.listdir(image_folder)
+        image_filename_list = [img_fn for img_fn in image_filename_list if img_fn.endswith('.' + image_file_extension)]
+        num_images = len(image_filename_list)
+        print('Number of images: {}'.format(num_images))
+        # iteratively handle each image
+        writer = None
+        start_time = time.time()
+        for image_index, image_filename in enumerate(image_filename_list):
+            # configure the tfrecord file to write
+            if image_index % num_images_per_tfrecord == 0:
+                file_out = "{}_{:03d}.tfrecords".format(output_filename, image_index // num_images_per_tfrecord)
+                # print("Writing on:", file_out)
+                writer = tf.python_io.TFRecordWriter(file_out)
 
-        # write to tfrecord
-        instance = tf.train.Example(features=tf.train.Features(feature={
-            'x': _bytes_feature(im.tobytes())  # both PIL.Image and np.ndarray has tobytes() method
-        }))
-        writer.write(instance.SerializeToString())
+            # read image
+            im = Image.open(os.path.join(image_folder, image_filename))
+            # resize and crop the image
+            if resize is not None:
+                height, width = im.size
+                factor = min(height / resize[0], width / resize[1])
+                im = im.resize((int(height / factor), int(width / factor)), Image.LANCZOS)
+            if crop is not None:
+                height, width = im.size
+                h_offset = int((height - crop[0]) / 2)
+                w_offset = int((width - crop[1]) / 2)
+                box = (h_offset, w_offset, h_offset + crop[0], w_offset + crop[1])
+                im = im.crop(box)
+            # save image if needed
+            if save_image:
+                image_save_file = os.path.join(save_folder, '%07d.png' % image_index)
+                im.save(image_save_file)
 
-        if image_index % 5000 == 0:
-            sys.stdout.write('\r {}/{} instances finished.'.format(image_index + 1, num_images))
-        if image_index % num_images_per_tfrecord == (num_images_per_tfrecord - 1):
-            writer.close()
-    writer.close()
-    duration = time.time() - start_time
-    sys.stdout.write('\n All {} instances finished in {:.1f} seconds'.format(num_images, duration))
+            # if image not RGB format, convert to rbg
+            if im.mode != 'RGB':
+                im = im.convert('RGB')
+            # if image format is channels_first, transpose im
+            if image_format in {'channels_first', 'NCHW'}:
+                im = np.array(im, dtype=np.uint8)
+                im = np.transpose(im, axes=(2, 0, 1))
+
+            # write to tfrecord
+            instance = tf.train.Example(features=tf.train.Features(feature={
+                'x': _bytes_feature(im.tobytes())  # both PIL.Image and np.ndarray has tobytes() method
+            }))
+            writer.write(instance.SerializeToString())
+
+            if image_index % 5000 == 0:
+                sys.stdout.write('\r {}/{} instances finished.'.format(image_index + 1, num_images))
+            if image_index % num_images_per_tfrecord == (num_images_per_tfrecord - 1):
+                writer.close()
+        writer.close()
+        duration = time.time() - start_time
+        sys.stdout.write('\n All {} instances finished in {:.1f} seconds'.format(num_images, duration))
 
 
 #######################################################################
@@ -370,49 +370,49 @@ def get_files_in_child_folders(parent_folder, file_extension='JPEG', do_sort=Tru
 def raw_image_to_np(
         image_file, image_format='NCHW', resize=None, crop=None, dtype=np.uint8,
         save_image=False, save_folder=None, save_name=None):
-    """ This function reads a single image to numpy array with resize and crop.
-    Note that resize is done before crop and crop is done w.r.t. the image center
+        """ This function reads a single image to numpy array with resize and crop.
+        Note that resize is done before crop and crop is done w.r.t. the image center
 
-    :param image_file:
-    :param image_format:
-    :param resize:
-    :param crop:
-    :param dtype:
-    :param save_image:
-    :param save_folder:
-    :param save_name:
-    :return:
-    """
-    from PIL import Image
+        :param image_file:
+        :param image_format:
+        :param resize:
+        :param crop:
+        :param dtype:
+        :param save_image:
+        :param save_folder:
+        :param save_name:
+        :return:
+        """
+        from PIL import Image
 
-    # read image
-    im = Image.open(image_file)
-    # resize and crop the image
-    if resize is not None:
-        height, width = im.size
-        factor = min(height / resize[0], width / resize[1])
-        im = im.resize((int(height / factor), int(width / factor)), Image.LANCZOS)
-    if crop is not None:
-        height, width = im.size
-        h_offset = int((height - crop[0]) / 2)
-        w_offset = int((width - crop[1]) / 2)
-        box = (h_offset, w_offset, h_offset + crop[0], w_offset + crop[1])
-        im = im.crop(box)
-    # save image if needed
-    if save_image:
-        image_save_file = os.path.join(save_folder, save_name)
-        im.save(image_save_file)
+        # read image
+        im = Image.open(image_file)
+        # resize and crop the image
+        if resize is not None:
+            height, width = im.size
+            factor = min(height / resize[0], width / resize[1])
+            im = im.resize((int(height / factor), int(width / factor)), Image.LANCZOS)
+        if crop is not None:
+            height, width = im.size
+            h_offset = int((height - crop[0]) / 2)
+            w_offset = int((width - crop[1]) / 2)
+            box = (h_offset, w_offset, h_offset + crop[0], w_offset + crop[1])
+            im = im.crop(box)
+        # save image if needed
+        if save_image:
+            image_save_file = os.path.join(save_folder, save_name)
+            im.save(image_save_file)
 
-    # if image not RGB format, convert to rbg
-    if im.mode != 'RGB':
-        im = im.convert('RGB')
-    # output np array
-    im = np.array(im, dtype=dtype)
-    # if image format is channels_first, transpose im
-    if image_format in {'channels_first', 'NCHW'}:
-        im = np.transpose(im, axes=(2, 0, 1))
+        # if image not RGB format, convert to rbg
+        if im.mode != 'RGB':
+            im = im.convert('RGB')
+        # output np array
+        im = np.array(im, dtype=dtype)
+        # if image format is channels_first, transpose im
+        if image_format in {'channels_first', 'NCHW'}:
+            im = np.transpose(im, axes=(2, 0, 1))
 
-    return im
+        return im
 
 
 #######################################################################
@@ -927,7 +927,7 @@ class ReadTFRecords(object):
             self.scheduled = True
 
     ###################################################################
-    def next_batch(self, sample_same_class=False, sample_class=None, shuffle_data=True, cast_x=None, cast_y=None):
+    def next_batch(self, sample_same_class=False, sample_class=None, shuffle_data=True):
         """ This function generates next batch
 
         :param sample_same_class: if the data must be sampled from the same class at one iteration
