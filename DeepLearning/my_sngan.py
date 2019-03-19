@@ -149,29 +149,29 @@ class SNGan(object):
 
     ###################################################################
     def gradient_penalty(self, x, x_gen, batch_size):
-    """ This function calculates the gradient penalty used in wassersetin gan
+        """ This function calculates the gradient penalty used in wassersetin gan
 
-    :param x:
-    :param x_gen:
-    :param batch_size:
-    :return:
-    """
-    with tf.name_scope('gradient_penalty'):
-        uni = tf.random_uniform(
-            shape=[batch_size, 1, 1, 1],  # [batch_size, channels, height, width]
-            minval=0.0, maxval=1.0,
-            name='uniform')
-        x_hat = tf.identity(
-            tf.add(tf.multiply(x, uni), tf.multiply(x_gen, tf.subtract(1.0, uni))),
-            name='x_hat')
-        s_x_hat = self.Dis(x_hat, is_training=False)
-        g_x_hat = tf.reshape(
-            tf.gradients(s_x_hat['x'], x_hat, name='gradient_x_hat')[0],
-            [batch_size, -1])
-        loss_grad_norm = tf.reduce_mean(
-            tf.square(tf.norm(g_x_hat, ord=2, axis=1) - 1))
-        
-        return loss_grad_norm
+        :param x:
+        :param x_gen:
+        :param batch_size:
+        :return:
+        """
+        with tf.name_scope('gradient_penalty'):
+            uni = tf.random_uniform(
+                shape=[batch_size, 1, 1, 1],  # [batch_size, channels, height, width]
+                minval=0.0, maxval=1.0,
+                name='uniform')
+            x_hat = tf.identity(
+                tf.add(tf.multiply(x, uni), tf.multiply(x_gen, tf.subtract(1.0, uni))),
+                name='x_hat')
+            s_x_hat = self.Dis(x_hat, is_training=False)
+            g_x_hat = tf.reshape(
+                tf.gradients(s_x_hat['x'], x_hat, name='gradient_x_hat')[0],
+                [batch_size, -1])
+            loss_grad_norm = tf.reduce_mean(
+                tf.square(tf.norm(g_x_hat, ord=2, axis=1) - 1))
+
+            return loss_grad_norm
 
     ###################################################################
     def mmd_gradient_penalty(self, x, x_gen, s_x, s_gen, batch_size, mode='fixed_g'):
