@@ -67,7 +67,7 @@ class SNGan(object):
         self.force_print = True
         # method parameters
         self.rep_weights = kwargs['rep_weights'] if 'rep_weights' in kwargs else [0.0, -1.0]
-        self.penalty_weight = kwargs['rep_weights'] if 'rep_weights' in kwargs else 0.1
+        self.penalty_weight = kwargs['mmd_g_scale'] if 'mmd_g_scale' in kwargs else 0.1
 
         if image_transpose:  # for dataset like MNIST, image needs to be transposed
             if FLAGS.IMAGE_FORMAT == 'channels_first':
