@@ -67,6 +67,7 @@ class SNGan(object):
         self.force_print = True
         # method parameters
         self.rep_weights = kwargs['rep_weights'] if 'rep_weights' in kwargs else [0.0, -1.0]
+        self.penalty_weight = kwargs['rep_weights'] if 'rep_weights' in kwargs else 0.1
 
         if image_transpose:  # for dataset like MNIST, image needs to be transposed
             if FLAGS.IMAGE_FORMAT == 'channels_first':
@@ -345,7 +346,7 @@ class SNGan(object):
                 self.sample_same_class = False
 
             training_data = ReadTFRecords(
-                filename, self.input_size, num_labels=num_labels, dtype=tf.string, batch_size=batch_size,
+                filename, self.input_size, num_labels=num_labels, x_dtype=tf.string, batch_size=batch_size,
                 file_repeat=file_repeat, num_threads=num_threads, shuffle_file=shuffle_file)
             # training_data = PreloadGPU(filename, num_instance, self.D, num_threads=num_threads)
             # convert matrix data to image tensor and scale them to [-1, 1]
